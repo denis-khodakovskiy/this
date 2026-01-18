@@ -1,0 +1,16 @@
+{
+  "name": "this/contracts",
+  "description": "Public contracts for THIS framework",
+  "type": "library",
+  "license": "MIT",
+
+  "require": {
+    "php": "^8.2"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\Contracts\\": "src/"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "this/core",
+  "description": "Core runtime for THIS framework",
+  "type": "library",
+  "license": "MIT",
+
+  "require": {
+    "php": "^8.2",
+    "this/contracts": "*"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\Core\\": "src/"
+    }
+  }
+}

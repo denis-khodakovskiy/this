@@ -1,0 +1,30 @@
+{
+  "name": "this/logger",
+  "description": "Logger for THIS framework",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+
+  "require": {
+    "php": "^8.2",
+    "this/contracts": "*",
+    "psr/log": "^3.0"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\Logger\\": "src/"
+    }
+  },
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../this-contracts",
+      "options": {
+        "symlink": true
+      }
+    }
+  ]
+}

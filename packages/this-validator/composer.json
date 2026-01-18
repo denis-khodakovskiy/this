@@ -1,0 +1,29 @@
+{
+  "name": "this/validator",
+  "description": "Validator for THIS framework",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+
+  "require": {
+    "php": "^8.2",
+    "this/contracts": "*"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\Validator\\": "src/"
+    }
+  },
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../this-contracts",
+      "options": {
+        "symlink": true
+      }
+    }
+  ]
+}

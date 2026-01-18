@@ -1,0 +1,18 @@
+<?php
+/**
+ * @author Denis Khodakovskii <denis.khodakovskiy@gmail.com>
+ */
+
+declare(strict_types=1);
+
+namespace This\Validator\Constraint;
+
+final class Url extends AbstractConstraint
+{
+    public function validate(mixed $value): ?string
+    {
+        return !filter_var($value, FILTER_VALIDATE_URL)
+            ? $this->message() ?? 'Invalid URL'
+            : null;
+    }
+}
