@@ -10,7 +10,7 @@ use App\Handlers\TestHandler;
 use This\Contracts\ContainerInterface;
 use This\i18n\Contracts\TranslatorInterface;
 
-return function (ContainerInterface $container): void {
+return static function (ContainerInterface $container): void {
     $container
         ->bind(id: HelloWorldHandler::class, definition: static fn (ContainerInterface $container) => new HelloWorldHandler())
         ->bind(id: TestHandler::class, definition: static fn (ContainerInterface $container) => new TestHandler(
