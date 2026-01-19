@@ -1,9 +1,7 @@
 # THIS — That Handles It Somehow
 
 **THIS** is not a framework for quick setup, scaffolding, or reflection-driven magic.
-
 It is a framework for developers who deliberately choose **explicit control over implicit behavior**.
-
 THIS is built for people who want to understand *exactly* what happens in their application, when it happens, and why.
 
 ---
@@ -86,18 +84,25 @@ THIS is **not** aimed at rapid prototyping, tutorials, or “five minutes to hel
 
 THIS trades:
 
-- speed of initial setup  
-  for
-- long-term clarity and control
-
-It trades:
-
-- implicit magic  
-  for
-- explicit behavior
+- speed of initial setup for long-term clarity and control
+- implicit magic for explicit behavior
 
 If you are comfortable with that trade-off, THIS will feel natural.
-
 If you are not, THIS will feel intentionally uncomfortable.
 
 That is by design.
+
+## Open Source and Contribution
+
+THIS is an open source project.
+
+Its source code is publicly available, and contribution is welcome.
+Bug reports, discussions, architectural proposals, and pull requests are encouraged.
+
+THIS is not developed behind closed doors.
+Design decisions are expected to be explicit, reviewable, and discussable.
+
+Distribution of the framework is allowed and encouraged.
+You are free to use THIS in personal, commercial, and experimental projects.
+
+If you find the approach useful, feel free to share it, fork it, or build on top of it.
