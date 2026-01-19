@@ -17,26 +17,20 @@ final class ScalarValidator
      */
     public static function validate(
         mixed $value,
-        AbstractFieldType $fieldType,
         array $constraints = [],
     ): ValidationResult {
-        $errors = [];
-
-        $value = $fieldType->normalize($value);
-        $typeError = $fieldType->validateType($value);
-
-        if ($typeError) {
-            $errors[] = $typeError;
-        }
+        $violations = [];
 
         foreach ($constraints as $constraint) {
-            $error = $constraint->validate($value);
-
-            if ($error !== null) {
-                $errors[] = $error;
+            if (!$constraint->validate($value)) {
+                $violations[] = new Violation(
+                    rule: $constraint->getConstraintCode(),
+                    value: $value,
+                    params: get_object_vars($constraint),
+                );
             }
         }
 
-        return new ValidationResult(errors: $errors, data: $value);
+        return new ValidationResult(violations: $violations);
     }
 }

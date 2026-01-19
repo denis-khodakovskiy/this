@@ -21,6 +21,6 @@ return [
     RouterMiddleware::class,
     RequestFreezeMiddleware::class,
     //TranslationMiddleware::class,
-    //ValidationMiddleware::class,
+    ValidationMiddleware::class,
     ExecutionMiddleware::class,
 ];

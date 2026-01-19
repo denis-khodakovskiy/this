@@ -1,219 +1,103 @@
-# THIS: That Handles It Somehow
+# THIS — That Handles It Somehow
 
-**THIS** is a minimalistic PHP application core focused on explicit architecture,
-predictable bootstrap behavior, and zero hidden magic.
+**THIS** is not a framework for quick setup, scaffolding, or reflection-driven magic.
 
-The project deliberately avoids auto-configuration, code scanning, and
-compile-time containers in favor of **explicit application assembly**
-and **runtime transparency**.
+It is a framework for developers who deliberately choose **explicit control over implicit behavior**.
 
-THIS is designed for developers who value clarity, control, and architectural reasoning
-over convenience abstractions.
+THIS is built for people who want to understand *exactly* what happens in their application, when it happens, and why.
 
 ---
 
-## Core Principles
+## Philosophy
 
-### 1. Explicit over convenient
-- No class scanning
-- No auto-wiring
-- No implicit service discovery
-- No “container guessing”
+Most modern frameworks optimize for speed of onboarding. They rely on auto-configuration, container compilation, reflection-based discovery, hidden registries, and conventions that silently shape application behavior.
 
-If something is used, it must be **explicitly registered**.
+THIS intentionally goes in the opposite direction.
 
----
+There is no automatic service discovery.  
+There is no container caching or compilation.  
+There is no reflection-based auto-wiring.  
+There are no hidden registries or global state.
 
-### 2. The container is read, not built
-In THIS, the container is **not a compiled artifact**.
+If something exists in the system, it exists because **you explicitly created it and wired it**.
 
-- No container build step
-- No container cache
-- No warm-up phase
-
-The container is defined as data and simply loaded at runtime.
-PHP OPcache does the rest.
-
-Cold start is predictable and fast.
+This is not a missing feature — it is a conscious design choice.
 
 ---
 
-### 3. Architecture over DX sugar
-THIS is not a framework for rapid CRUD or zero-config applications.
+## Explicit Over Implicit
 
-It is intended for:
-- infrastructure code
-- complex pipelines
-- CLI and worker-based systems
-- applications with strict responsibility boundaries
+In THIS, behavior is preferred over conventions.
 
-Developer experience is achieved through **structure**, not automation.
+You do not “enable” features by installing packages.  
+You do not get functionality by naming things correctly.  
+You do not rely on side effects of scanning or bootstrapping.
 
----
+Every important decision is made in code, in one place, in plain sight.
 
-### 4. No global magic
-- No global container
-- No service locator
-- No hidden dependencies
-
-All dependencies are:
-- explicitly defined
-- or resolved at boundary layers (bootstrap, handlers)
+This makes the system slightly more verbose, but significantly more predictable.
 
 ---
 
-## System Structure
+## No Magic by Design
 
-THIS separates the system into **clear architectural layers**,
-each with a strictly limited responsibility.
+THIS avoids architectural shortcuts that trade clarity for convenience.
 
----
+There is no container compilation step that changes runtime behavior.  
+There is no reflection-driven registration that silently alters execution flow.  
+There is no autoconfiguration that depends on environment, cache, or build artifacts.
 
-### Kernel
-Responsible for:
-- application bootstrap
-- pipeline assembly
-- middleware execution
-- container usage
+Runtime behavior is the same every time the application starts.
 
-The kernel **contains no business logic**.
+What you read in code is what the system does.
 
 ---
 
-### Container
-The container in THIS:
-- does not scan code
-- does not use reflection
-- does not auto-configure services
+## Manual Configuration as a Feature
 
-It:
-- reads configuration
-- knows how to create services
-- creates only what is actually requested
+All configuration in THIS is manual.
 
-Container configuration can be split into multiple files:
-- services
-- handlers
-- factories
-- middleware
-- vendor packages
+Pipelines are assembled explicitly.  
+Middleware is added intentionally and in a defined order.  
+Message handlers are registered by hand.  
+Validation rules are declared, not inferred.
+
+This approach shifts responsibility from the framework to the developer — on purpose.
+
+The result is a system where nothing happens accidentally.
 
 ---
 
-### Middleware
-Middleware in THIS:
-- is linear
-- does not branch the pipeline
-- does not mutate the pipeline
-- performs one clearly defined task
+## Who THIS Is For
 
-Middleware **must not**:
-- contain business logic
-- know about i18n
-- resolve services dynamically
+THIS is designed for developers who:
 
----
+- prefer control over convenience
+- want to understand and own their architecture
+- are comfortable with explicit wiring
+- value predictability over shortcuts
+- are building long-lived systems, not prototypes
 
-### Validation
-The validation package:
-- has no knowledge of i18n
-- has no access to the container
-- does not format messages
-- performs no side effects
-
-It:
-- validates data
-- returns validation results
-
-`FormSchema` is a **declarative object**, not a service.
+THIS is **not** aimed at rapid prototyping, tutorials, or “five minutes to hello world”.
 
 ---
 
-### i18n
-i18n is an infrastructure concern.
+## A Conscious Trade-off
 
-- Translations are plain PHP files
-- Translation keys may be human-readable text
-- Missing translations are acceptable
-- Locale is provided by execution context
+THIS trades:
 
-i18n **never participates in validation directly**.
+- speed of initial setup  
+  for
+- long-term clarity and control
 
----
+It trades:
 
-## Bootstrap and Boundaries
+- implicit magic  
+  for
+- explicit behavior
 
-THIS strictly distinguishes between:
-- declaration (schemas, rules, structure)
-- execution (handlers, middleware)
-- boundary logic (HTTP, CLI, workers)
+If you are comfortable with that trade-off, THIS will feel natural.
 
-Objects with dependencies may be created **only at boundary layers**.
+If you are not, THIS will feel intentionally uncomfortable.
 
----
-
-## Why No Auto-Configuration
-
-Auto-configuration:
-- hides dependencies
-- complicates debugging
-- requires compile-time containers
-- depends on container caching
-
-THIS deliberately avoids it in favor of:
-- transparency
-- predictability
-- architectural clarity
-
----
-
-## Caching
-
-THIS **does not require** container caching.
-
-Possible caches:
-- PHP OPcache
-- environment configuration cache
-- route cache (optional)
-
-If a system requires caching to function correctly,
-it is usually an architectural problem, not a performance one.
-
----
-
-## Project Philosophy
-
-THIS is not “yet another framework”.
-
-It is:
-- an architectural core
-- a tool for conscious system design
-- a system where it is always clear *why* things work the way they do
-
-The project prioritizes:
-- long-term maintainability
-- reasoning simplicity
-- minimal hidden decisions
-
----
-
-## Who This Is For
-
-THIS is suitable if you:
-- want to understand the entire system
-- value explicit dependencies
-- build infrastructure-level software
-- accept explicit code in exchange for clarity
-
-THIS is **not suitable** if you:
-- expect zero-config behavior
-- rely on auto-scanning
-- want a Symfony/Laravel replacement
-
----
-
-## Status
-
-THIS is under active development.
-Architecture decisions are made deliberately,
-without rushing and without backward-compatibility pressure.
+That is by design.
