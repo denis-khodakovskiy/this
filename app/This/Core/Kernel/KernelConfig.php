@@ -7,10 +7,11 @@ declare(strict_types=1);
 
 namespace App\This\Core\Kernel;
 
-use App\Enums\EnvEnum;
 use App\This\Infrastructure\Config\PathResolver;
+use This\Contracts\EnvEnum;
+use This\Contracts\KernelConfigInterface;
 
-final readonly class KernelConfig
+final readonly class KernelConfig implements KernelConfigInterface
 {
     private PathResolver $paths;
 
@@ -19,6 +20,7 @@ final readonly class KernelConfig
         public string $varDir,
         public EnvEnum $env = EnvEnum::DEV,
         public bool $debug = true,
+        public string $defaultLocale = 'en',
     ) {
         $this->paths = new PathResolver(aliases: [
             '%app%' => rtrim($appDir, '/'),
@@ -29,5 +31,10 @@ final readonly class KernelConfig
     public function path(string $path): string
     {
         return $this->paths->resolve(path: $path);
+    }
+
+    public function getDefaultLocale(): string
+    {
+        return $this->defaultLocale;
     }
 }

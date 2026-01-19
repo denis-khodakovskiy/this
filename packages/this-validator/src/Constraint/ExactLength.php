@@ -11,15 +11,11 @@ final class ExactLength extends AbstractConstraint
 {
     public function __construct(
         public readonly int $length,
-        \Closure|string|null $message = null,
     ) {
-        parent::__construct($message);
     }
 
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return mb_strlen($value) !== $this->length
-            ? $this->message() ?? "Value must be exactly {$this->length} characters"
-            : null;
+        return mb_strlen($value) === $this->length;
     }
 }

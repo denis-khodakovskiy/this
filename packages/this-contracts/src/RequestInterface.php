@@ -7,8 +7,6 @@ declare(strict_types=1);
 
 namespace This\Contracts;
 
-use App\This\Core\Enums\RequestMethodsEnum;
-
 interface RequestInterface
 {
     public function setMethod(RequestMethodsEnum $method): self;

@@ -11,15 +11,11 @@ final class Regex extends AbstractConstraint
 {
     public function __construct(
         private readonly string $pattern,
-        \Closure|string|null $message = null,
     ) {
-        parent::__construct($message);
     }
 
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return !preg_match($this->pattern, $value)
-            ? $this->message() ?? 'Value does not match pattern'
-            : null;
+        return preg_match($this->pattern, $value);
     }
 }

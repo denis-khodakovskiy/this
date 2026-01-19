@@ -7,12 +7,12 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Execution;
 
-use App\This\Core\Enums\RequestMethodsEnum;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use This\Contracts\ContextInterface;
 use This\Contracts\MiddlewareInterface;
+use This\Contracts\RequestMethodsEnum;
 
 final class ExecutionMiddleware implements MiddlewareInterface
 {

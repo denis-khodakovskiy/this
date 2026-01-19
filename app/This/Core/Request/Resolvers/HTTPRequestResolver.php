@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace App\This\Core\Request\Resolvers;
 
-use App\This\Core\Enums\RequestMethodsEnum;
 use App\This\Core\Request\Request;
 use This\Contracts\RequestInterface;
+use This\Contracts\RequestMethodsEnum;
 use This\Contracts\RequestResolverInterface;
 
 final readonly class HTTPRequestResolver implements RequestResolverInterface

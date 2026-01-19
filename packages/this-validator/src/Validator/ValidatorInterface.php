@@ -11,5 +11,7 @@ use This\Validator\Schema\FormSchemaInterface;
 
 interface ValidatorInterface
 {
-    public function validate(FormSchemaInterface $schema, array $input): ValidationResult;
+    public function validateInput(FormSchemaInterface $schema, array $input): ValidationResult;
+
+    public function validate(object $object): ValidationResult;
 }

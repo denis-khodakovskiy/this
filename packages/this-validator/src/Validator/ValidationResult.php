@@ -10,12 +10,10 @@ namespace This\Validator\Validator;
 final readonly class ValidationResult
 {
     /**
-     * @param array<non-empty-string|array-key, non-empty-string|array<non-empty-string, non-empty-string>> $errors
-     * @param array<non-empty-string, non-empty-string> $data
+     * @param array<Violation> $violations
      */
     public function __construct(
-        public array $errors,
-        public mixed $data,
+        public array $violations = [],
     ) {
     }
 

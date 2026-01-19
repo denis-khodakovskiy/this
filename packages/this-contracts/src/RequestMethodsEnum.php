@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace App\This\Core\Enums;
+namespace This\Contracts;
 
 enum RequestMethodsEnum: string
 {

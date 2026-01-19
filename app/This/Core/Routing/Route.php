@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace App\This\Core\Routing;
 
-use App\This\Core\Enums\RequestMethodsEnum;
+use This\Contracts\RequestMethodsEnum;
 use This\Contracts\RouteEnvEnum;
 use This\Contracts\RouteInterface;
 use This\Contracts\RouterPolicyInterface;

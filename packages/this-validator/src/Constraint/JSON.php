@@ -9,10 +9,10 @@ namespace This\Validator\Constraint;
 
 final class JSON extends AbstractConstraint
 {
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return !json_decode($value)
-            ? $this->message() ?? 'Invalid JSON'
-            : null;
+        $result = json_decode($value);
+
+        return $result !== false && $result !== null;
     }
 }

@@ -10,8 +10,10 @@ namespace App;
 use App\This\Core\Kernel\Context;
 use App\This\Core\Kernel\KernelConfig;
 use App\This\Core\Routing\RouteRegistry;
+use App\This\Infrastructure\Container\Container;
 use This\Contracts\ContainerInterface;
 use This\Contracts\ContextInterface;
+use This\Contracts\KernelConfigProviderInterface;
 use This\Contracts\KernelInterface;
 
 final class Kernel implements KernelInterface
@@ -30,6 +32,7 @@ final class Kernel implements KernelInterface
         KernelConfig $config,
     ) {
         $this->container = $container($config);
+        $this->container->get(id: KernelConfigProviderInterface::class)->setConfig($config);
         $routerRegistry = $this->container->get(id: RouteRegistry::class);
         $router($routerRegistry);
         $routerRegistry->freeze();

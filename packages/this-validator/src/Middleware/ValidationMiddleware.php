@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace This\Validator\Middleware;
 
-use App\This\Core\Enums\RequestMethodsEnum;
 use This\Contracts\ContextInterface;
 use This\Contracts\MiddlewareInterface;
+use This\Contracts\RequestMethodsEnum;
 use This\Validator\Exception\ValidationException;
 use This\Validator\Schema\FormSchemaInterface;
 use This\Validator\Validator\Validator;
@@ -33,7 +33,7 @@ class ValidationMiddleware implements MiddlewareInterface
                     default => $request->getBodyParameters(),
                 };
 
-                $result = (new Validator())->validate(schema: $formSchema, input: $input);
+                $result = (new Validator())->validateInput(schema: $formSchema, input: $input);
 
                 if (!$result->isValid()) {
                     throw ValidationException::fromValidationResult(validationResult: $result);

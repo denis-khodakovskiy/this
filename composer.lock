@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43ad4ffabbc3b2f5785d0eaf0e310c16",
+    "content-hash": "1db65d5a00fe41fafd9ae4f4a5ecc61d",
     "packages": [
         {
             "name": "doctrine/deprecations",
@@ -1202,7 +1202,7 @@
         },
         {
             "name": "this/contracts",
-            "version": "dev-main",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/this-contracts",
@@ -1228,7 +1228,7 @@
         },
         {
             "name": "this/core",
-            "version": "dev-main",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/this-core",
@@ -1254,8 +1254,35 @@
             }
         },
         {
+            "name": "this/i18n",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/this-i18n",
+                "reference": "b69156af4fd0bdb7b753c74e0ccba182f8228a14"
+            },
+            "require": {
+                "php": "^8.2",
+                "this/contracts": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "This\\i18n\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Locale translator for THIS framework",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "this/logger",
-            "version": "dev-main",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/this-logger",
@@ -1283,7 +1310,7 @@
         },
         {
             "name": "this/validator",
-            "version": "dev-main",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/this-validator",
@@ -3080,6 +3107,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "this/i18n": 20,
         "this/logger": 20,
         "this/validator": 20
     },

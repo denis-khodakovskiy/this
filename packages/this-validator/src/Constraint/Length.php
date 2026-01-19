@@ -10,39 +10,20 @@ namespace This\Validator\Constraint;
 final class Length extends AbstractConstraint
 {
     public function __construct(
-        private readonly ?int $min = null,
-        private readonly ?int $max = null,
-        \Closure|string|null $message = null,
+        public readonly ?int $min = null,
+        public readonly ?int $max = null,
     ) {
-        parent::__construct($message);
     }
 
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
         if (!is_string($value) && !is_array($value)) {
-            return null;
+            return false;
         }
 
-        if (
-            $this->min !== null
-            && (
-                is_string($value) && mb_strlen($value) < $this->min
-                || is_array($value) && count($value) < $this->min
-            )
-        ) {
-            return $this->message() ?? "Minimum length is {$this->min}";
-        }
-
-        if (
-            $this->max !== null
-            && (
-                is_string($value) && mb_strlen($value) > $this->max
-                || is_array($value) && count($value) > $this->max
-            )
-        ) {
-            return $this->message() ?? "Maximum length is {$this->max}";
-        }
-
-        return null;
+        return match (true) {
+            is_string($value) => mb_strlen($value) >= $this->min && mb_strlen($value) <= $this->max,
+            default => count($value) >= $this->min && count($value) <= $this->max,
+        };
     }
 }

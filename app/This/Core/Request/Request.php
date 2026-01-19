@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace App\This\Core\Request;
 
-use App\This\Core\Enums\RequestMethodsEnum;
 use This\Contracts\RequestInterface;
+use This\Contracts\RequestMethodsEnum;
 
 final class Request implements RequestInterface
 {

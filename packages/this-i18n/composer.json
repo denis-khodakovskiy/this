@@ -7,12 +7,23 @@
   "prefer-stable": true,
 
   "require": {
-    "php": "^8.2"
+    "php": "^8.2",
+    "this/contracts": "dev-master"
   },
 
   "autoload": {
     "psr-4": {
       "This\\i18n\\": "src/"
     }
-  }
+  },
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../this-contracts",
+      "options": {
+        "symlink": true
+      }
+    }
+  ]
 }

@@ -14,15 +14,11 @@ final class OneOf extends AbstractConstraint
      */
     public function __construct(
         private readonly array $allowed = [],
-        \Closure|string|null $message = null,
     ) {
-        parent::__construct($message);
     }
 
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return !in_array($value, $this->allowed, true)
-            ? $this->message() ?? 'Invalid value'
-            : null;
+        return in_array($value, $this->allowed, true);
     }
 }

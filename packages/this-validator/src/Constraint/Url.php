@@ -9,10 +9,8 @@ namespace This\Validator\Constraint;
 
 final class Url extends AbstractConstraint
 {
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return !filter_var($value, FILTER_VALIDATE_URL)
-            ? $this->message() ?? 'Invalid URL'
-            : null;
+        return filter_var($value, FILTER_VALIDATE_URL);
     }
 }

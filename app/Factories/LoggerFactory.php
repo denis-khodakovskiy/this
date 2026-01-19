@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace App\Factories;
 
-use App\This\Core\Kernel\KernelConfig;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use This\Contracts\KernelConfigProviderInterface;
 use This\Logger\Logger;
 use This\Logger\LoggerChannel;
 use This\Logger\Transport\FileTransport;
@@ -17,7 +17,7 @@ use This\Logger\Transport\FileTransport;
 final readonly class LoggerFactory
 {
     public function __construct(
-        private KernelConfig $config,
+        private KernelConfigProviderInterface $config,
     ) {
     }
 
@@ -27,7 +27,7 @@ final readonly class LoggerFactory
             channels: [
                 new LoggerChannel(
                     transport: new FileTransport(
-                        filePath: $this->config->path(path: '%var%') . '/logs/app.log',
+                        filePath: $this->config->getConfig()->path(path: '%var%') . '/logs/app.log',
                     ),
                     minLevel: LogLevel::DEBUG,
                 ),

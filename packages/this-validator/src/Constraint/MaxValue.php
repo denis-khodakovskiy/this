@@ -10,20 +10,16 @@ namespace This\Validator\Constraint;
 final class MaxValue extends AbstractConstraint
 {
     public function __construct(
-        private readonly int $max,
-        \Closure|string|null $message = null,
+        public readonly int $max,
     ) {
-        parent::__construct($message);
     }
 
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
         if (!is_int($value)) {
-            return null;
+            return false;
         }
 
-        return $value > $this->max
-            ? $this->message() ?? "Value must be less or equal to {$this->max}"
-            : null;
+        return $value <= $this->max;
     }
 }

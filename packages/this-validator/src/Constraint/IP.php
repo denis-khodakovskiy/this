@@ -9,10 +9,8 @@ namespace This\Validator\Constraint;
 
 final class IP extends AbstractConstraint
 {
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return filter_var($value, FILTER_VALIDATE_IP)
-            ? $this->message() ?? 'Invalid IP'
-            : null;
+        return filter_var($value, FILTER_VALIDATE_IP);
     }
 }

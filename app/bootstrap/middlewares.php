@@ -11,6 +11,7 @@ use App\This\Middlewares\Execution\ExecutionMiddleware;
 use App\This\Middlewares\Request\RequestFreezeMiddleware;
 use App\This\Middlewares\Request\RequestInitMiddleware;
 use App\This\Middlewares\Routing\RouterMiddleware;
+use This\i18n\Middleware\TranslationMiddleware;
 use This\Validator\Middleware\ValidationMiddleware;
 
 return [
@@ -19,6 +20,7 @@ return [
     RequestInitMiddleware::class,
     RouterMiddleware::class,
     RequestFreezeMiddleware::class,
-    ValidationMiddleware::class,
+    //TranslationMiddleware::class,
+    //ValidationMiddleware::class,
     ExecutionMiddleware::class,
 ];

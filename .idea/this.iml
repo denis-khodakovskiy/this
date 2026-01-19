@@ -50,6 +50,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/serializer-pack" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/type-info" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/this/i18n" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/this/logger" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/this/validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />

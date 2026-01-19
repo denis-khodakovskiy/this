@@ -9,10 +9,8 @@ namespace This\Validator\Constraint;
 
 final class Required extends AbstractConstraint
 {
-    public function validate(mixed $value): ?string
+    public function validate(mixed $value): bool
     {
-        return $value === null || $value === ''
-            ? $this->message() ?? 'Field is required'
-            : null;
+        return $value !== null && $value !== '';
     }
 }

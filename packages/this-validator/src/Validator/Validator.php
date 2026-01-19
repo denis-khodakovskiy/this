@@ -7,24 +7,76 @@ declare(strict_types=1);
 
 namespace This\Validator\Validator;
 
+use This\Validator\Constraint\AbstractConstraint;
+use This\Validator\Constraint\Attributes\ConstraintAttributeInterface;
 use This\Validator\Constraint\Required;
 use This\Validator\Schema\FormSchemaInterface;
 
 final readonly class Validator implements ValidatorInterface
 {
-    public function validate(FormSchemaInterface $schema, array $input): ValidationResult
+    public function validate(object $object): ValidationResult
     {
-        $errors = [];
-        $data = [];
+        if (!is_object($object)) {
+            throw new \RuntimeException('Invalid object provided');
+        }
+
+        $violations = [];
+
+        $reflection = new \ReflectionClass($object);
+        foreach ($reflection->getProperties() as $property) {
+            foreach ($property->getAttributes() as $attribute) {
+                /** @var ConstraintAttributeInterface $attributeInstance */
+                $attributeInstance = $attribute->newInstance();
+
+                if (!$attributeInstance instanceof ConstraintAttributeInterface) {
+                    continue;
+                }
+
+                $args = get_object_vars($attributeInstance);
+                $validatorClass = $attributeInstance->getValidatorFQCN();
+
+                if ([] !== $args) {
+                    $validator = new $validatorClass(
+                        ...$args,
+                    );
+                } else {
+                    $validator = new $validatorClass();
+                }
+
+                if (!$validator instanceof AbstractConstraint) {
+                    continue;
+                }
+
+                $value = $property->getValue($object);
+
+                if (!$validator->validate($value)) {
+                    $violations[$property->getName()] = new Violation(
+                        rule: $validator->getConstraintCode(),
+                        value: $value,
+                        params: $args,
+                    );
+                }
+            }
+        }
+
+        return new ValidationResult(violations: $violations);
+    }
+
+    public function validateInput(FormSchemaInterface $schema, array $input): ValidationResult
+    {
+        $violations = [];
 
         foreach ($schema->fields() as $field) {
             $value = $input[$field->name] ?? null;
 
             if ($field->required) {
-                $requiredError = (new Required())->validate($value);
+                $required = (new Required())->validate(value: $value);
 
-                if ($requiredError !== null) {
-                    $errors[$field->name][] = $requiredError;
+                if (!$required) {
+                    $violations[$field->name] = new Violation(
+                        rule: 'required',
+                        value: null,
+                    );
 
                     continue;
                 }
@@ -34,26 +86,17 @@ final readonly class Validator implements ValidatorInterface
                 continue;
             }
 
-            $value = $field->type->normalize($value);
-            $typeError = $field->type->validateType($value);
-
-            if ($typeError !== null) {
-                $errors[$field->name][] = $typeError;
-
-                continue;
-            }
-
             foreach ($field->constraints as $constraint) {
-                $error = $constraint->validate($value);
-
-                if ($error !== null) {
-                    $errors[$field->name][] = $error;
+                if (!$constraint->validate($value)) {
+                    $violations[$field->name] = new Violation(
+                        rule: $constraint->getConstraintCode(),
+                        value: null,
+                        params: get_object_vars($constraint),
+                    );
                 }
             }
-
-            $data[$field->name] = $value;
         }
 
-        return new ValidationResult($errors, $data);
+        return new ValidationResult(violations: $violations);
     }
 }

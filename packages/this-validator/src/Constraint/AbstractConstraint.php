@@ -9,19 +9,10 @@ namespace This\Validator\Constraint;
 
 abstract class AbstractConstraint
 {
-    public function __construct(
-        private readonly \Closure|string|null $message = null,
-    ) {
-    }
+    abstract public function validate(mixed $value): bool;
 
-    abstract public function validate(mixed $value): ?string;
-
-    protected function message(): string|null
+    public function getConstraintCode(): string
     {
-        return match (true) {
-            $this->message instanceof \Closure => ($this->message)(),
-            is_string($this->message) => $this->message,
-            default => null,
-        };
+        return static::class;
     }
 }

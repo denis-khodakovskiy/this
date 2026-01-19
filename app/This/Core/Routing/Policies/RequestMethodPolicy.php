@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace App\This\Core\Routing\Policies;
 
-use App\This\Core\Enums\RequestMethodsEnum;
+use This\Contracts\RequestMethodsEnum;
 use This\Contracts\RouterPolicyInterface;
 
 final readonly class RequestMethodPolicy implements RouterPolicyInterface
