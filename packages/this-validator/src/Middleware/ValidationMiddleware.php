@@ -21,26 +21,6 @@ class ValidationMiddleware implements MiddlewareInterface
      */
     public function __invoke(ContextInterface $context, callable $next): void
     {
-        foreach ($context->getRoute()->getMeta() as $meta) {
-            if (is_subclass_of($meta, FormSchemaInterface::class)) {
-                $formSchema = new $meta();
-
-                $request = $context->getRequest();
-                $input = match (true) {
-                    $context->isCli() => $request->getAttributes(),
-                    $request->getMethod() === RequestMethodsEnum::GET => $request->get(),
-                    $request->getMethod() === RequestMethodsEnum::POST => $request->post(),
-                    default => $request->getBodyParameters(),
-                };
-
-                $result = (new Validator())->validateInput(schema: $formSchema, input: $input);
-
-                if (!$result->isValid()) {
-                    throw ValidationException::fromValidationResult(validationResult: $result);
-                }
-            }
-        }
-
         $next($context);
     }
 }

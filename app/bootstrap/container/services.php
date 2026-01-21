@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 use App\Factories\LoggerFactory;
+use App\Factories\MessagesHandlersRegistryFactory;
 use App\Factories\RequestResolversRegistryFactory;
 use App\Factories\RouterPolicyRegistryFactory;
 use App\This\Core\Error\ExceptionHandler;
@@ -19,11 +20,13 @@ use This\Contracts\KernelConfigProviderInterface;
 use This\Contracts\RequestProviderInterface;
 use This\Contracts\RequestResolversRegistryInterface;
 use This\Contracts\RouterPolicyRegistryInterface;
+use This\Messenger\Handler\MessagesHandlersRegistryInterface;
 use This\Validator\Validator\Validator;
 use This\Validator\Validator\ValidatorInterface;
 
 return function (ContainerInterface $container): void {
     $container
+        ->singleton(id: MessagesHandlersRegistryInterface::class, definition: new MessagesHandlersRegistryFactory())
         ->bind(id: RequestResolversRegistryInterface::class, definition: new RequestResolversRegistryFactory())
         ->bind(id: RouterPolicyRegistryInterface::class, definition: new RouterPolicyRegistryFactory())
         ->bind(id: ExceptionHandlerInterface::class, definition: static fn () => new ExceptionHandler())

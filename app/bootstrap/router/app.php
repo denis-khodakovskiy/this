@@ -3,6 +3,7 @@
  * @author Denis Khodakovskii <denis.khodakovskiy@gmail.com>
  */
 
+use App\Handlers\MessengerTestHandler;
 use App\Handlers\TestHandler;
 use App\This\Core\Routing\Route;
 use App\This\Core\Routing\RouteRegistry;
@@ -21,6 +22,11 @@ return function (RouteRegistry $router) {
             name: 'test',
             path: '/test',
             handler: TestHandler::class,
+        ))
+        ->addRoute(new Route(
+            name: 'messenger.test',
+            path: '/messenger',
+            handler: MessengerTestHandler::class,
         ))
     ;
 };

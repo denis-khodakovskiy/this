@@ -7,12 +7,17 @@ declare(strict_types=1);
 
 namespace This\Validator\Validator;
 
-final readonly class Violation
+final class Violation
 {
+    /**
+     * @param array<string, mixed> $params
+     * @param array<string, mixed> $meta
+     */
     public function __construct(
-        public string $rule,
-        public mixed $value,
-        public array $params = [],
+        public readonly string $rule,
+        public readonly mixed $value,
+        public readonly array $params = [],
+        public array $meta = [],
     ) {
     }
 }

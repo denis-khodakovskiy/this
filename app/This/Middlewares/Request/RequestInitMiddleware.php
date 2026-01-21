@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Request;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use This\Contracts\ContextInterface;
 use This\Contracts\RequestProviderInterface;
 use This\Contracts\RequestResolverInterface;
@@ -14,6 +16,10 @@ use This\Contracts\RequestResolversRegistryInterface;
 
 class RequestInitMiddleware
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function __invoke(ContextInterface $context, callable $next): void
     {
         /** @var RequestResolverInterface $requestResolver */

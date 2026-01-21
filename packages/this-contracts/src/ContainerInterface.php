@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace This\Contracts;
 
-interface ContainerInterface
+interface ContainerInterface extends \Psr\Container\ContainerInterface
 {
     public function bind(string $id, callable $definition): self;
 

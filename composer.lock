@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1db65d5a00fe41fafd9ae4f4a5ecc61d",
+    "content-hash": "cf59e63aa56183f6718f298756428e15",
     "packages": [
         {
             "name": "doctrine/deprecations",
@@ -1303,6 +1303,33 @@
                 "MIT"
             ],
             "description": "Logger for THIS framework",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "this/messenger",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/this-messenger",
+                "reference": "dd22cf31205d05a9e4235188eeaea5125f2d4ba6"
+            },
+            "require": {
+                "php": "^8.2",
+                "this/contracts": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "This\\Messenger\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Messenger for THIS framework",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -3109,6 +3136,7 @@
     "stability-flags": {
         "this/i18n": 20,
         "this/logger": 20,
+        "this/messenger": 20,
         "this/validator": 20
     },
     "prefer-stable": true,

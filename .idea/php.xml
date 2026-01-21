@@ -63,6 +63,7 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-grapheme" />
       <path value="$PROJECT_DIR$/vendor/this/validator" />
       <path value="$PROJECT_DIR$/vendor/this/i18n" />
+      <path value="$PROJECT_DIR$/vendor/this/messenger" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.3" />

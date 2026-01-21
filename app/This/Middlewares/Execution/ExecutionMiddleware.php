@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Execution;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -17,7 +19,8 @@ use This\Contracts\RequestMethodsEnum;
 final class ExecutionMiddleware implements MiddlewareInterface
 {
     /**
-     * @throws ExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __invoke(ContextInterface $context, callable $next): void
     {
