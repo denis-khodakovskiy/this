@@ -10,6 +10,7 @@ use App\This\Middlewares\Error\ErrorBoundaryMiddleware;
 use App\This\Middlewares\Execution\ExecutionMiddleware;
 use App\This\Middlewares\Request\RequestFreezeMiddleware;
 use App\This\Middlewares\Request\RequestInitMiddleware;
+use App\This\Middlewares\Response\ResponseHandlingMiddleware;
 use App\This\Middlewares\Routing\RouterMiddleware;
 use This\i18n\Middleware\TranslationMiddleware;
 use This\Validator\Middleware\ValidationMiddleware;
@@ -23,4 +24,5 @@ return [
     //TranslationMiddleware::class,
     ValidationMiddleware::class,
     ExecutionMiddleware::class,
+    ResponseHandlingMiddleware::class
 ];

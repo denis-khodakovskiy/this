@@ -13,6 +13,7 @@ $files = [
     require_once __DIR__ . '/middlewares.php',
     require_once __DIR__ . '/services.php',
     require_once __DIR__ . '/messenger.php',
+    require_once __DIR__ . '/cache.php',
 ];
 
 return function (KernelConfig $kernelConfig) use ($files): ContainerInterface {

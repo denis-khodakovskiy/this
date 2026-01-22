@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\This\Core\Kernel;
 
+use App\This\Core\Response\Response;
 use This\Contracts\ContainerInterface;
 use This\Contracts\ContextInterface;
 use This\Contracts\RequestInterface;
@@ -43,14 +44,14 @@ final class Context implements ContextInterface
         return $this->request;
     }
 
-    public function setResponse(mixed $response): self
+    public function setResponse(Response $response): self
     {
         $this->response = $response;
 
         return $this;
     }
 
-    public function getResponse(): mixed
+    public function getResponse(): ?Response
     {
         return $this->response;
     }

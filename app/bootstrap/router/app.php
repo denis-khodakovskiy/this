@@ -3,6 +3,7 @@
  * @author Denis Khodakovskii <denis.khodakovskiy@gmail.com>
  */
 
+use App\Handlers\CacheTestHandler;
 use App\Handlers\MessengerTestHandler;
 use App\Handlers\TestHandler;
 use App\This\Core\Routing\Route;
@@ -17,6 +18,11 @@ return function (RouteRegistry $router) {
             path: '/', handler:
             \App\Handlers\Cli\IndexHandler::class,
             env: RouteEnvEnum::CLI,
+        ))
+        ->addRoute(new Route(
+            name: 'cache.test',
+            path: '/cache',
+            handler: CacheTestHandler::class,
         ))
         ->addRoute(new Route(
             name: 'test',

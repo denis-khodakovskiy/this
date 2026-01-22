@@ -9,6 +9,7 @@ use App\This\Middlewares\Error\ErrorBoundaryMiddleware;
 use App\This\Middlewares\Execution\ExecutionMiddleware;
 use App\This\Middlewares\Request\RequestFreezeMiddleware;
 use App\This\Middlewares\Request\RequestInitMiddleware;
+use App\This\Middlewares\Response\ResponseHandlingMiddleware;
 use App\This\Middlewares\Routing\RouterMiddleware;
 use This\Contracts\ContainerInterface;
 use This\Contracts\ExceptionHandlerInterface;
@@ -29,5 +30,6 @@ return function (ContainerInterface $container): void {
         ->bind(id: RequestFreezeMiddleware::class, definition: static fn () => new RequestFreezeMiddleware())
         ->bind(id: ValidationMiddleware::class, definition: static fn () => new ValidationMiddleware())
         ->bind(id: ExecutionMiddleware::class, definition: static fn () => new ExecutionMiddleware())
+        ->bind(id: ResponseHandlingMiddleware::class, definition: static fn () => new ResponseHandlingMiddleware())
     ;
 };

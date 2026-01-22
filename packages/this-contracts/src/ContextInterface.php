@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace This\Contracts;
 
+use App\This\Core\Response\Response;
+
 interface ContextInterface
 {
     public function getContainer(): ContainerInterface;
@@ -15,9 +17,9 @@ interface ContextInterface
 
     public function getRequest(): RequestInterface;
 
-    public function setResponse(mixed $response): self;
+    public function setResponse(Response $response): self;
 
-    public function getResponse(): mixed;
+    public function getResponse(): ?Response;
 
     public function setException(\Throwable $exception): self;
 

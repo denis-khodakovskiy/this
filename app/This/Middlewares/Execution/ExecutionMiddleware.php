@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Execution;
 
+use App\This\Core\Response\Response;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -24,6 +25,12 @@ final class ExecutionMiddleware implements MiddlewareInterface
      */
     public function __invoke(ContextInterface $context, callable $next): void
     {
+        if ($context->getResponse() !== null) {
+            $next($context);
+
+            return;
+        }
+
         $handler = $context->getContainer()->get(id: $context->getRoute()->getHandler());
 
         if (!$handler) {
@@ -47,11 +54,17 @@ final class ExecutionMiddleware implements MiddlewareInterface
             );
         }
 
-        call_user_func_array(
-            $handler,
-            $requestDto
-                ? [...array_values($request->getPathParameters()), $requestDto]
-                : array_values($request->getPathParameters()),
+        $context->setResponse(
+            new Response(
+                statusCode: 200,
+                content: call_user_func_array(
+                    $handler,
+                    $requestDto
+                        ? [...array_values($request->getPathParameters()), $requestDto]
+                        : array_values($request->getPathParameters()),
+                ),
+                headers: [],
+            ),
         );
     }
 }
