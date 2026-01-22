@@ -5,7 +5,7 @@ networks:
 
 services:
     php:
-        container_name: ${this}_php
+        container_name: ${PROJECT_SLUG}_php
         build:
             context: ./php
             args:

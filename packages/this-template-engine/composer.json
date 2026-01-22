@@ -1,0 +1,19 @@
+{
+  "name": "this/template-engine",
+  "description": "Template engine for THIS framework",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+
+  "require": {
+    "php": "^8.2",
+    "this/contracts": "dev-master"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\TemplateEngine\\": "src/"
+    }
+  }
+}

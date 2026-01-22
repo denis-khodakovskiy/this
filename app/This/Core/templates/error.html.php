@@ -104,6 +104,8 @@ use This\Contracts\ContextInterface;
             border-radius: 8px;
             margin-bottom: 16px;
             overflow: hidden;
+            box-shadow: none;
+            transition: box-shadow 0.3s;
         }
 
         .stack-header {
@@ -112,6 +114,7 @@ use This\Contracts\ContextInterface;
             border-bottom: 1px solid var(--border);
             font-size: 13px;
             color: var(--muted);
+            cursor: pointer;
         }
 
         .stack-header strong {
@@ -125,6 +128,11 @@ use This\Contracts\ContextInterface;
             font-size: 13px;
             padding: 16px;
             overflow-x: auto;
+            display: none;
+        }
+
+        .stack-frame.show .code {
+            display: block;
         }
 
         .code-line {
@@ -156,6 +164,11 @@ use This\Contracts\ContextInterface;
             color: var(--muted);
             text-align: center;
         }
+
+        .stack-frame:hover {
+            box-shadow: #ddd 0 0 5px 2px;
+            transition: box-shadow 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -180,7 +193,7 @@ use This\Contracts\ContextInterface;
         </div>
     </section>
 
-    <section class="stack-frame">
+    <section class="stack-frame show">
         <div class="stack-header">
             <strong>
                 <?= $exceptionFrame['file'] ?>:<?= $exceptionFrame['line'] ?>
@@ -229,8 +242,13 @@ use This\Contracts\ContextInterface;
     THIS Framework · Debug mode · Execution stopped
 </footer>
 
+<script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
 <script>
-    document.getElementsByClassName('.stack-header')
+$(function () {
+    $(document).on('click', '.stack-header', function () {
+        let $frame = $(this).closest('.stack-frame').toggleClass('show');
+    });
+});
 </script>
 
 </body>

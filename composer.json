@@ -30,56 +30,56 @@
   "repositories": [
     {
       "type": "path",
-      "url": "packages/this-contracts",
+      "url": "../packages/this-contracts",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-core",
+      "url": "../packages/this-core",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-logger",
+      "url": "../packages/this-logger",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-validator",
+      "url": "../packages/this-validator",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-i18n",
+      "url": "../packages/this-i18n",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-messenger",
+      "url": "../packages/this-messenger",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-cache",
+      "url": "../packages/this-cache",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "packages/this-controller",
+      "url": "../packages/this-controller",
       "options": {
         "symlink": true
       }
