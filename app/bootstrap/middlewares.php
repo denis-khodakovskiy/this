@@ -12,7 +12,7 @@ use App\This\Middlewares\Request\RequestFreezeMiddleware;
 use App\This\Middlewares\Request\RequestInitMiddleware;
 use App\This\Middlewares\Response\ResponseHandlingMiddleware;
 use App\This\Middlewares\Routing\RouterMiddleware;
-use This\i18n\Middleware\TranslationMiddleware;
+use This\Controller\Middleware\ControllerResolverMiddleware;
 use This\Validator\Middleware\ValidationMiddleware;
 
 return [
@@ -21,8 +21,8 @@ return [
     RequestInitMiddleware::class,
     RouterMiddleware::class,
     RequestFreezeMiddleware::class,
-    //TranslationMiddleware::class,
     ValidationMiddleware::class,
+    ControllerResolverMiddleware::class,
     ExecutionMiddleware::class,
     ResponseHandlingMiddleware::class
 ];

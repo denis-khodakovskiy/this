@@ -16,16 +16,20 @@ final readonly class CacheTestHandler
     ) {
     }
 
-    public function __invoke(): void
+    public function __invoke(): string
     {
-        $key = 'key';
-
-        var_dump($this->cache->get(
-            'test',
-            static function () use ($key) {
-                return $key;
-            },
-            300
-        ));
+        return sprintf(<<<HTML
+            <pre style="text-align: center">
+                <div>
+                    <h2>THIS: That Handles It Somehow</h2>
+                    <h3>Congratulations! It works!</h3>
+                    <p>%s handler was executed</p>
+                    <p>You can find it here: %s</p>
+                </div>
+            </pre>
+            HTML,
+            __METHOD__,
+            __FILE__,
+        );
     }
 }

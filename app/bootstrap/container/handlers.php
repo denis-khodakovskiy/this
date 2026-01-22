@@ -26,5 +26,6 @@ return function (ContainerInterface $container): void {
         ->bind(id: TestHandler::class, definition: static fn (ContainerInterface $container) => new TestHandler(
             $container->get(id: \This\Validator\Validator\ValidatorInterface::class),
         ))
+        ->bind(id: \App\Handlers\UserController::class, definition: static fn () => new \App\Handlers\UserController())
     ;
 };

@@ -7,29 +7,101 @@ declare(strict_types=1);
 
 namespace App\This\Core\Error;
 
+use App\This\Core\Kernel\KernelConfigProvider;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use This\Contracts\ContextInterface;
 use This\Contracts\ExceptionHandlerInterface;
+use This\Contracts\KernelConfigProviderInterface;
 use This\Validator\Exception\ValidationException;
 
 final readonly class ExceptionHandler implements ExceptionHandlerInterface
 {
+    /**
+     * @throws \Throwable
+     */
     public function handle(\Throwable $exception, ContextInterface $context): void
     {
-        echo '<pre>';
-        echo sprintf(
-            "An error occurred: [%d] %s\n%s:%d\nTrace:\n%s",
-            $exception->getCode(),
-            $exception->getMessage(),
-            $exception->getFile(),
-            $exception->getLine(),
-            $exception->getTraceAsString(),
-        );
-        echo PHP_EOL;
-        if ($exception instanceof ValidationException) {
-            foreach ($exception->validationResult->errors as $fieldName => $errors) {
-                echo sprintf('%s: %s', $fieldName, implode(', ', $errors)) . PHP_EOL;
+        echo match (true) {
+            $context->isCli() => '',
+            $context->isHttp() => $this->renderHtml($exception, $context),
+            default => sprintf(
+                'An error occurred in %s:%d: %s',
+                $exception->getFile(),
+                $exception->getLine(),
+                $exception->getMessage()
+            ),
+        };
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function renderHtml(\Throwable $exception, ContextInterface $context): string
+    {
+        /** @var KernelConfigProvider $configProvider */
+        $configProvider = $context->getContainer()->get(id: KernelConfigProviderInterface::class);
+
+        $exceptionFrame = [
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'code' => $this->extractCodeSnippet(
+                $exception->getFile(),
+                $exception->getLine()
+            ),
+        ];
+
+        $traceFrames = [];
+
+        foreach ($exception->getTrace() as $row) {
+            if (empty($row['file']) || empty($row['line'])) {
+                continue;
             }
+
+            $traceFrames[] = [
+                'class' => $row['class'] ?? null,
+                'function' => $row['function'] ?? null,
+                'file' => $row['file'],
+                'line' => $row['line'],
+                'code' => $this->extractCodeSnippet(
+                    $row['file'],
+                    $row['line']
+                ),
+            ];
         }
-        echo '</pre>';
+
+        ob_start();
+        require_once $configProvider->getConfig()->path('%app%') . '/This/Core/templates/error.html.php';
+
+        return ob_get_clean();
+    }
+
+    private function extractCodeSnippet(string $file, int $line, int $radius = 5): array
+    {
+        if (!is_readable($file)) {
+            return [];
+        }
+
+        $fileObject = new \SplFileObject($file);
+        $fileObject->setFlags(\SplFileObject::DROP_NEW_LINE);
+
+        $start = max(1, $line - $radius);
+        $end   = $line + $radius;
+
+        $fileObject->seek($start - 1);
+
+        $result = [];
+
+        for ($i = $start; $i <= $end && !$fileObject->eof(); $i++) {
+            $result[] = [
+                'number'    => $i,
+                'content'   => $fileObject->current(),
+                'highlight' => $i === $line,
+            ];
+            $fileObject->next();
+        }
+
+        return $result;
     }
 }

@@ -1,0 +1,29 @@
+{
+  "name": "this/controller",
+  "description": "Controllers for THIS framework",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+
+  "require": {
+    "php": "^8.2",
+    "this/contracts": "dev-master"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "This\\Controller\\": "src/"
+    }
+  },
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../this-contracts",
+      "options": {
+        "symlink": true
+      }
+    }
+  ]
+}

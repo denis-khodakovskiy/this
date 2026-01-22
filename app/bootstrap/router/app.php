@@ -34,5 +34,10 @@ return function (RouteRegistry $router) {
             path: '/messenger',
             handler: MessengerTestHandler::class,
         ))
+        ->addRoute(new Route(
+            name: 'controller.test',
+            path: '/user/list',
+            handler: \App\Handlers\UserController::class,
+        ))
     ;
 };

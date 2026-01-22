@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ecbff6872722adf8ddb62756c37cffd",
+    "content-hash": "d2d20c57fb869cd592926955cc0730d0",
     "packages": [
         {
             "name": "doctrine/deprecations",
@@ -1298,6 +1298,33 @@
                 "MIT"
             ],
             "description": "Public contracts for THIS framework",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "this/controller",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "packages/this-controller",
+                "reference": "54e427f3881d3bc1a8d5e273d8fe9d1e34bbab42"
+            },
+            "require": {
+                "php": "^8.2",
+                "this/contracts": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "This\\Controller\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Controllers for THIS framework",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -3212,6 +3239,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "this/cache": 20,
+        "this/controller": 20,
         "this/i18n": 20,
         "this/logger": 20,
         "this/messenger": 20,

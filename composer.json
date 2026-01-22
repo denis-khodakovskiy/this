@@ -18,7 +18,8 @@
     "this/i18n": "dev-master",
     "this/messenger": "dev-master",
     "psr/simple-cache": "^3.0",
-    "this/cache": "dev-master"
+    "this/cache": "dev-master",
+    "this/controller": "dev-master"
   },
 
   "require-dev": {
@@ -72,6 +73,13 @@
     {
       "type": "path",
       "url": "packages/this-cache",
+      "options": {
+        "symlink": true
+      }
+    },
+    {
+      "type": "path",
+      "url": "packages/this-controller",
       "options": {
         "symlink": true
       }

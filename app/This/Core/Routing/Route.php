@@ -26,7 +26,7 @@ final readonly class Route implements RouteInterface
         private string $handler,
         private array $methods = [RequestMethodsEnum::GET],
         private RouteEnvEnum $env = RouteEnvEnum::HTTP,
-        private ?string $requestFQCN = null,
+        private ?string $requestDtoFQCN = null,
         private array $requirements = [],
         private array $policies = [],
         private array $meta = [],
@@ -68,9 +68,9 @@ final readonly class Route implements RouteInterface
         return $this->env === RouteEnvEnum::HTTP;
     }
 
-    public function getRequestFQCN(): ?string
+    public function getRequestDtoFQCN(): ?string
     {
-        return $this->requestFQCN;
+        return $this->requestDtoFQCN;
     }
 
     public function getRequirements(): array

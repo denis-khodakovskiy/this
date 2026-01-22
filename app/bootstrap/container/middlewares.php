@@ -14,6 +14,7 @@ use App\This\Middlewares\Routing\RouterMiddleware;
 use This\Contracts\ContainerInterface;
 use This\Contracts\ExceptionHandlerInterface;
 use This\Contracts\RouterPolicyRegistryInterface;
+use This\Controller\Middleware\ControllerResolverMiddleware;
 use This\Validator\Middleware\ValidationMiddleware;
 
 return function (ContainerInterface $container): void {
@@ -29,6 +30,7 @@ return function (ContainerInterface $container): void {
         ))
         ->bind(id: RequestFreezeMiddleware::class, definition: static fn () => new RequestFreezeMiddleware())
         ->bind(id: ValidationMiddleware::class, definition: static fn () => new ValidationMiddleware())
+        ->bind(id: ControllerResolverMiddleware::class, definition: static fn () => new ControllerResolverMiddleware())
         ->bind(id: ExecutionMiddleware::class, definition: static fn () => new ExecutionMiddleware())
         ->bind(id: ResponseHandlingMiddleware::class, definition: static fn () => new ResponseHandlingMiddleware())
     ;

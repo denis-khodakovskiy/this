@@ -21,7 +21,7 @@ interface RouteInterface
 
     public function getHandler(): string;
 
-    public function getRequestFQCN(): ?string;
+    public function getRequestDtoFQCN(): ?string;
 
     /**
      * @return array<non-empty-string, mixed>

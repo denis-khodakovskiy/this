@@ -1,4 +1,3 @@
-<pre>
 <?php
 /**
  * @author Denis Khodakovskii <denis.khodakovskiy@gmail.com>

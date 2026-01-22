@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Execution;
 
+use App\This\Core\Invoker\InvokableTarget;
 use App\This\Core\Response\Response;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use This\Contracts\ContextInterface;
@@ -37,10 +37,14 @@ final class ExecutionMiddleware implements MiddlewareInterface
             throw new \RuntimeException('No route handler found');
         }
 
+        if (!is_callable($handler)) {
+            throw new \RuntimeException('Handler is not callable');
+        }
+
         $requestDto = null;
         $request = $context->getRequest();
 
-        if ($context->getRoute()->getRequestFQCN()) {
+        if ($context->getRoute()->getRequestDtoFQCN()) {
             $serializer = new Serializer([new ObjectNormalizer()]);
 
             $requestDto = $serializer->denormalize(
@@ -50,21 +54,26 @@ final class ExecutionMiddleware implements MiddlewareInterface
                     $request->getMethod() === RequestMethodsEnum::POST => $request->post(),
                     default => $request->getBodyParameters(),
                 },
-                $context->getRoute()->getRequestFQCN(),
+                $context->getRoute()->getRequestDtoFQCN(),
             );
         }
 
         $context->setResponse(
             new Response(
                 statusCode: 200,
-                content: call_user_func_array(
-                    $handler,
-                    $requestDto
-                        ? [...array_values($request->getPathParameters()), $requestDto]
-                        : array_values($request->getPathParameters()),
-                ),
+                content: (new InvokableTarget(
+                    static fn () =>
+                        call_user_func_array(
+                            $handler,
+                            $requestDto
+                                ? [...array_values($request->getPathParameters()), $requestDto]
+                                : array_values($request->getPathParameters()),
+                        ),
+                ))->execute(),
                 headers: [],
             ),
         );
+
+        $next($context);
     }
 }

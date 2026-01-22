@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Response;
 
-use http\Header;
 use This\Contracts\ContextInterface;
 use This\Contracts\MiddlewareInterface;
 
@@ -21,8 +20,8 @@ final class ResponseHandlingMiddleware implements MiddlewareInterface
 
         $response = $context->getResponse();
 
-        http_response_code($response->statusCode);
-
-        echo $response->content;
+        if (null !== $response->content) {
+            echo $response->content;
+        }
     }
 }
