@@ -5,8 +5,7 @@
   "license": "MIT",
 
   "require": {
-    "php": "^8.2",
-    "this/contracts": "*"
+    "php": "^8.2"
   },
 
   "autoload": {

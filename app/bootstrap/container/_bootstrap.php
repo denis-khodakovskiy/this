@@ -14,6 +14,7 @@ $files = [
     require_once __DIR__ . '/services.php',
     require_once __DIR__ . '/messenger.php',
     require_once __DIR__ . '/cache.php',
+    require_once __DIR__ . '/orm.php',
 ];
 
 return function (KernelConfig $kernelConfig) use ($files): ContainerInterface {

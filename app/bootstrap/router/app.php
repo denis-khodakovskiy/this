@@ -39,5 +39,10 @@ return function (RouteRegistry $router) {
             path: '/user/list',
             handler: \App\Handlers\UserController::class,
         ))
+        ->addRoute(new Route(
+            name: 'orm.text',
+            path: '/orm',
+            handler: \App\Handlers\ORMHandler::class,
+        ))
     ;
 };
