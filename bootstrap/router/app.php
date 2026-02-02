@@ -44,5 +44,11 @@ return function (RouteRegistry $router) {
             path: '/orm',
             handler: \App\Handlers\ORMHandler::class,
         ))
+        ->addRoute(new Route(
+            name: 'orm.text',
+            path: '/orm/{action}/{id}',
+            handler: \App\Handlers\ORMHandler::class,
+            requirements: ['action' => '[a-z]+'],
+        ))
     ;
 };

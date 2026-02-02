@@ -22,7 +22,7 @@ final class ControllerResolverMiddleware
      */
     public function __invoke(ContextInterface $context, callable $next): void
     {
-        if ($context->getResponse() !== null) {
+        if ($context->getResponse() !== null || $context->isCli()) {
             $next($context);
 
             return;
@@ -37,7 +37,16 @@ final class ControllerResolverMiddleware
         $pathParts = explode('/', trim($context->getRoute()->getPath(), '/'));
         $action = $pathParts[1] ?? 'index';
 
+        $pathParameters = [];
+
+        if (str_starts_with($action, '{') && str_ends_with($action, '}')) {
+            $pathParameters = $context->getRequest()->getPathParameters();
+
+            $action = array_shift($pathParameters);
+        }
+
         $reflection = new \ReflectionClass($handler);
+
         if (!$reflection->hasMethod($action)) {
             $next($context);
 
@@ -45,19 +54,18 @@ final class ControllerResolverMiddleware
         }
 
         $method = $reflection->getMethod($action);
+
         if (!$method->isPublic()) {
-            throw new \RuntimeException(sprintf(
-                'Method %s::%s() needs to be public',
-                $handler::class,
-                $action,
-            ));
+            $next($context);
+
+            return;
         }
 
         $context->setResponse(
             new Response(
                 statusCode: 200,
                 content: (new ControllerTarget(
-                    static fn () => $handler->{$action}()
+                    static fn () => $handler->{$action}(...$pathParameters)
                 ))->execute(),
                 headers: [],
             ),

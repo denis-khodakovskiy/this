@@ -16,6 +16,7 @@ final readonly class KernelConfig implements KernelConfigInterface
     private PathResolver $paths;
 
     public function __construct(
+        public string $rootDir,
         public string $appDir,
         public string $varDir,
         public EnvEnum $env = EnvEnum::DEV,
@@ -23,6 +24,7 @@ final readonly class KernelConfig implements KernelConfigInterface
         public string $defaultLocale = 'en',
     ) {
         $this->paths = new PathResolver(aliases: [
+            '%root%' => rtrim($rootDir, '/'),
             '%app%' => rtrim($appDir, '/'),
             '%var%' => rtrim($varDir, '/'),
         ]);

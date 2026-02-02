@@ -16,7 +16,7 @@ final class CompiledSelect extends AbstractCompiledQuery
      * @param array<array-key, non-empty-string> $select
      * @param array<CompiledJoinExpression> $joins
      * @param array<array-key, non-empty-string> $groupBy
-     * @param array<non-empty-string, non-empty-string> $orderBy
+     * @param array<non-empty-string, 'ASC'|'DESC'> $orderBy
      * @param array<non-empty-string, non-empty-string|numeric> $params
      */
     public function __construct(

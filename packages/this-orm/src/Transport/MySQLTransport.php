@@ -35,11 +35,11 @@ final class MySQLTransport implements TransportInterface
             'SELECT ' . implode(', ', array_map(
                 function (string|AggregateExpression $node) {
                     return $node instanceof AggregateExpression
-                        ? "{$node->function}({$this->parseName($node->field)})" . ($node->alias ? " AS `{$node->alias}`" : '')
+                        ? "{$node->function}({$this->parseName($node->field)})" . ($node->alias ? ' AS ' . $this->formatAlias($node->alias) : '')
                         : $this->parseName($node);
                 },
                 $query->select,
-            )) . " FROM {$this->parseName($query->fromTable)} `{$query->alias}`",
+            )) . ' FROM ' . $this->parseName($query->fromTable) . ' ' . $this->formatAlias($query->alias),
         ];
 
         if ($query->joins) {
@@ -67,17 +67,31 @@ final class MySQLTransport implements TransportInterface
             $order = [];
 
             foreach ($query->orderBy as $field => $direction) {
-                $order[] = "{$this->parseName($field)} {$direction}";
+                if (!is_string($direction)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Order direction for "%s" must be "ASC" or "DESC".', $field)
+                    );
+                }
+
+                $normalizedDirection = strtoupper($direction);
+
+                if (!in_array($normalizedDirection, ['ASC', 'DESC'], true)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Order direction for "%s" must be "ASC" or "DESC".', $field)
+                    );
+                }
+
+                $order[] = "{$this->parseName($field)} {$normalizedDirection}";
             }
 
             $parts[] = 'ORDER BY ' . implode(', ', $order);
         }
 
-        if ($query->limit) {
+        if ($query->limit !== null) {
             $parts[] = 'LIMIT ' . $query->limit;
         }
 
-        if ($query->offset) {
+        if ($query->offset !== null) {
             $parts[] = 'OFFSET ' . $query->offset;
         }
 
@@ -107,7 +121,7 @@ final class MySQLTransport implements TransportInterface
         }
 
         $parts = [
-            "UPDATE {$this->parseName($query->table)} `{$query->alias}`",
+            'UPDATE ' . $this->parseName($query->table) . ' ' . $this->formatAlias($query->alias),
         ];
 
         if ($query->joins) {
@@ -137,7 +151,7 @@ final class MySQLTransport implements TransportInterface
         }
 
         $parts = [
-            "DELETE `{$query->alias}` FROM " . $this->parseName($query->table) . " `{$query->alias}`",
+            'DELETE ' . $this->formatAlias($query->alias) . ' FROM ' . $this->parseName($query->table) . ' ' . $this->formatAlias($query->alias),
         ];
 
         if ($query->joins) {
@@ -210,7 +224,7 @@ final class MySQLTransport implements TransportInterface
             $expr->type,
             'JOIN',
             $this->parseName($expr->tableName),
-            "`{$expr->alias}`",
+            $this->formatAlias($expr->alias),
             'ON',
             $this->compile($expr->on),
         ]);
@@ -252,15 +266,52 @@ final class MySQLTransport implements TransportInterface
         };
     }
 
-    private function parseName(string $field): string
+    private function parseName(string $name): string
     {
-        if (!str_contains($field, '.')) {
-            return "`$field`";
+        if ($name === '*') {
+            return '*';
+        }
+
+        $name = mb_strtolower($name);
+        $alias = '';
+
+        if (str_contains($name, 'as')) {
+            [$name, $alias] = explode('as', $name, 2);
+            $name = trim($name);
+            $alias = trim($alias);
+
+            $this->assertValidIdentifier($alias);
+        }
+
+        if (!str_contains($name, '.')) {
+            $this->assertValidIdentifier($name);
+
+            return "`$name`";
+        }
+
+        $parts = explode('.', $name);
+
+        foreach ($parts as $part) {
+            $this->assertValidIdentifier($part);
         }
 
         return implode('.', array_map(
-            static fn (string $part) => "`{$part}`",
-            explode('.', $field),
-        ));
+            static fn (string $part) => $part === '*' ? '*' : "`{$part}`",
+            $parts,
+        )) . ($alias !== '' ? " AS `$alias`" : '');
+    }
+
+    private function formatAlias(string $alias): string
+    {
+        $this->assertValidIdentifier($alias);
+
+        return "`{$alias}`";
+    }
+
+    private function assertValidIdentifier(string $identifier): void
+    {
+        if (preg_match('/^[A-Za-z_*][A-Za-z0-9_]*$/', $identifier) !== 1) {
+            throw new \InvalidArgumentException("Invalid identifier: {$identifier}");
+        }
     }
 }

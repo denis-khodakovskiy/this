@@ -13,7 +13,6 @@ use Psr\Container\NotFoundExceptionInterface;
 use This\Contracts\ContextInterface;
 use This\Contracts\ExceptionHandlerInterface;
 use This\Contracts\KernelConfigProviderInterface;
-use This\Validator\Exception\ValidationException;
 
 final readonly class ExceptionHandler implements ExceptionHandlerInterface
 {
@@ -23,7 +22,7 @@ final readonly class ExceptionHandler implements ExceptionHandlerInterface
     public function handle(\Throwable $exception, ContextInterface $context): void
     {
         echo match (true) {
-            $context->isCli() => '',
+            //$context->isCli() => $exception->getMessage(),
             $context->isHttp() => $this->renderHtml($exception, $context),
             default => sprintf(
                 'An error occurred in %s:%d: %s',

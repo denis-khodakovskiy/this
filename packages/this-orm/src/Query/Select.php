@@ -18,7 +18,7 @@ final class Select extends AbstractQuery
     /** @var array<non-empty-string> */
     private array $select = ['*'];
 
-    /** @var array{field: string, dir: 'ASC'|'DESC'} */
+    /** @var array<non-empty-string, 'ASC'|'DESC'> */
     private array $orderBy = [];
 
     /** @var array<non-empty-string> */
@@ -53,8 +53,19 @@ final class Select extends AbstractQuery
         return $this->select;
     }
 
+    /**
+     * @param array<non-empty-string, 'ASC'|'DESC'> $order
+     */
     public function orderBy(array $order): self
     {
+        foreach ($order as $field => $direction) {
+            if (!is_string($direction) || !in_array($direction, ['ASC', 'DESC'], true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Order direction for "%s" must be "ASC" or "DESC".', $field)
+                );
+            }
+        }
+
         $this->orderBy = $order;
 
         return $this;
@@ -67,6 +78,10 @@ final class Select extends AbstractQuery
 
     public function limit(int $limit): self
     {
+        if ($limit < 0) {
+            throw new \InvalidArgumentException('Limit must be non-negative.');
+        }
+
         $this->limit = $limit;
 
         return $this;
@@ -79,6 +94,10 @@ final class Select extends AbstractQuery
 
     public function offset(int $offset): self
     {
+        if ($offset < 0) {
+            throw new \InvalidArgumentException('Offset must be non-negative.');
+        }
+
         $this->offset = $offset;
 
         return $this;

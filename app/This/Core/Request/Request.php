@@ -233,7 +233,7 @@ final class Request implements RequestInterface
         return $this;
     }
 
-    public function getAttribute(string $key, $default = null): mixed
+    public function getAttribute(string|int $key, $default = null): mixed
     {
         return $this->attributes[$key] ?? $default;
     }

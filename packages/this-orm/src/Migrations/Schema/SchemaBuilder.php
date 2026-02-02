@@ -5,8 +5,9 @@
 
 declare(strict_types=1);
 
-use Psr\Container\ContainerInterface;
+namespace This\ORM\Migrations\Schema;
 
-return static function (ContainerInterface $container): void {
+final class SchemaBuilder
+{
 
-};
+}

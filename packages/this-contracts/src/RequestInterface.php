@@ -65,7 +65,7 @@ interface RequestInterface
 
     public function setAttributes(array $attributes): self;
 
-    public function getAttribute(string $key, $default = null): mixed;
+    public function getAttribute(string|int $key, $default = null): mixed;
 
     public function getAttributes(): array;
 

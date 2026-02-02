@@ -9,12 +9,14 @@ use App\Factories\LoggerFactory;
 use App\Factories\MessagesHandlersRegistryFactory;
 use App\Factories\RequestResolversRegistryFactory;
 use App\Factories\RouterPolicyRegistryFactory;
+use App\This\Core\Env\EnvContainer;
 use App\This\Core\Error\ExceptionHandler;
 use App\This\Core\Kernel\KernelConfigProvider;
 use App\This\Core\Request\RequestProvider;
 use App\This\Core\Routing\RouteRegistry;
 use Psr\Log\LoggerInterface;
 use This\Contracts\ContainerInterface;
+use This\Contracts\EnvContainerInterface;
 use This\Contracts\ExceptionHandlerInterface;
 use This\Contracts\KernelConfigProviderInterface;
 use This\Contracts\RequestProviderInterface;
@@ -40,5 +42,8 @@ return function (ContainerInterface $container): void {
             ))(),
         )
         ->singleton(id: KernelConfigProviderInterface::class, definition: static fn () => new KernelConfigProvider())
+        ->singleton(id: EnvContainerInterface::class, definition: static fn (ContainerInterface $container) => new EnvContainer(
+            $container->get(KernelConfigProviderInterface::class)->getConfig()->path('%root%') . '/.env',
+        ))
     ;
 };

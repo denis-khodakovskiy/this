@@ -10,7 +10,8 @@ namespace App;
 use App\This\Core\Kernel\Context;
 use App\This\Core\Kernel\KernelConfig;
 use App\This\Core\Routing\RouteRegistry;
-use App\This\Infrastructure\Container\Container;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use This\Contracts\ContainerInterface;
 use This\Contracts\ContextInterface;
 use This\Contracts\KernelConfigProviderInterface;
@@ -18,12 +19,14 @@ use This\Contracts\KernelInterface;
 
 final class Kernel implements KernelInterface
 {
-    private ?ContainerInterface $container = null;
+    private ContainerInterface $container;
 
     private bool $booted = false;
 
     /**
      * @param array<non-empty-string, non-empty-string> $middlewares
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __construct(
         \Closure $container,
@@ -39,6 +42,10 @@ final class Kernel implements KernelInterface
         $this->container->freeze();
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function run(): void
     {
         if ($this->booted) {
@@ -65,6 +72,10 @@ final class Kernel implements KernelInterface
         );
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     private function launchPipeline(): void
     {
         $container = $this->container;

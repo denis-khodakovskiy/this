@@ -27,5 +27,8 @@ return function (ContainerInterface $container): void {
             $container->get(id: \This\Validator\Validator\ValidatorInterface::class),
         ))
         ->bind(id: \App\Handlers\UserController::class, definition: static fn () => new \App\Handlers\UserController())
+        ->bind(id: \App\Handlers\ORMHandler::class, definition: static fn (ContainerInterface $container) => new \App\Handlers\ORMHandler(
+            $container->get(id: \This\ORM\ORM::class),
+        ))
     ;
 };
