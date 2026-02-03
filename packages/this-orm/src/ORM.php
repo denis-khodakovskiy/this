@@ -19,7 +19,7 @@ use This\ORM\Query\Select;
 use This\ORM\Schema\PersistableInterface;
 use This\ORM\Transport\TransportInterface;
 
-final class ORM
+final class ORM implements ORMInterface
 {
     private ?AbstractQuery $query = null;
 
@@ -140,11 +140,14 @@ final class ORM
         return $this->query($query)->execute();
     }
 
-    public function debug(): array
+    public function rawSql(string $statement): array
     {
-        return [
-            $this->preparedStatement,
-            $this->params,
-        ];
+        $stmt = $this->pdo->prepare($statement);
+
+        if (!$stmt->execute()) {
+            throw new \RuntimeException('An error occurred while executing ');
+        }
+
+        return $stmt->fetchAll();
     }
 }

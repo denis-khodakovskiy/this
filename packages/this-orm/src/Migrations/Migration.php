@@ -7,7 +7,21 @@ declare(strict_types=1);
 
 namespace This\ORM\Migrations;
 
-class Migration
-{
+use This\ORM\Migrations\Schema\SchemaBuilderInterface;
 
+abstract class Migration
+{
+    abstract public function up(SchemaBuilderInterface $schemaBuilder): void;
+
+    abstract public function down(SchemaBuilderInterface $schemaBuilder): void;
+
+    public function draft(): bool
+    {
+        return true;
+    }
+
+    public function draftReason(): ?string
+    {
+        return null;
+    }
 }

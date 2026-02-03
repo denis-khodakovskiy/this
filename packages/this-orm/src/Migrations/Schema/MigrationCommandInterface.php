@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace This\ORM\Migrations\Schema;
 
-interface CommandInterface
+interface MigrationCommandInterface
 {
+    public function getDescription(): ?string;
 }

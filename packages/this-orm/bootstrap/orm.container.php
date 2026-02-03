@@ -10,13 +10,14 @@ use This\Contracts\EnvContainerInterface;
 use This\ORM\Compiler\ExpressionCompiler;
 use This\ORM\Compiler\QueryCompiler;
 use This\ORM\ORM;
+use This\ORM\ORMInterface;
 use This\ORM\Transport\MySQLTransport;
 use This\ORM\Transport\TransportInterface;
 
 return static function (ContainerInterface $container): void {
     $container
         ->bind(id: TransportInterface::class, definition: static fn () => new MySQLTransport())
-        ->singleton(id: ORM::class, definition: static function (ContainerInterface $container): ORM {
+        ->singleton(id: ORMInterface::class, definition: static function (ContainerInterface $container): ORM {
             /** @var EnvContainerInterface $env */
             $env = $container->get(id: EnvContainerInterface::class);
 

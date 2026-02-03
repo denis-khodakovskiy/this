@@ -7,19 +7,16 @@ declare(strict_types=1);
 
 namespace This\ORM\Migrations\Schema;
 
-final class TableCommandCollector
+final class SchemaCommandCollector
 {
     /** @var array<MigrationCommandInterface> */
     private array $commands = [];
 
-    public function addCommand(MigrationCommandInterface $command): void
+    public function add(MigrationCommandInterface $command): void
     {
         $this->commands[] = $command;
     }
 
-    /**
-     * @return array<MigrationCommandInterface>
-     */
     public function getCommands(): array
     {
         return $this->commands;

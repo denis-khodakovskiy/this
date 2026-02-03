@@ -5,9 +5,7 @@
 
 declare(strict_types=1);
 
-namespace This\Orm\Compiler;
-
-use This\ORM\DQL\Compiled\Token\ParamToken;
+namespace This\ORM\Compiler;
 
 final class ParametersBag
 {

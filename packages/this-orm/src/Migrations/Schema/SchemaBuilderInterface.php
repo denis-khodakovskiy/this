@@ -7,19 +7,25 @@ declare(strict_types=1);
 
 namespace This\ORM\Migrations\Schema;
 
+use This\ORM\Migrations\Command\CreateForeignKeyCommand;
+use This\ORM\Migrations\Command\CreateIndexCommand;
+
 interface SchemaBuilderInterface
 {
-    public function createTable(
-        string $name,
-        callable $definition
-    ): void;
+    public function createTable(string $name, callable $definition): void;
 
     public function dropTable(string $name): void;
 
-    public function table(
-        string $name,
-        callable $definition
-    ): void;
+    public function table(string $name, callable $definition): void;
+
+    public function createIndex(string $table, array $columns): CreateIndexCommand;
+
+    public function createForeignKey(
+        string $table,
+        string $column,
+        string $referenceTable,
+        string $referenceColumn
+    ): CreateForeignKeyCommand;
 
     public function nonRollBack(): self;
 }
