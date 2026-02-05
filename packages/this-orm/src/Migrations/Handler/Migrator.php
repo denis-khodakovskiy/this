@@ -8,20 +8,22 @@ declare(strict_types=1);
 namespace This\ORM\Migrations\Handler;
 
 use This\Contracts\RequestInterface;
+use This\ORM\DQL\Expr;
 use This\ORM\Migrations\Compiler\Compiler;
 use This\ORM\Migrations\Command\CreateIndexCommand;
 use This\ORM\Migrations\Command\CreateTableCommand;
 use This\ORM\Migrations\Migration;
-use This\ORM\Migrations\Output\CLIMarkupRenderer;
-use This\ORM\Migrations\Output\CLIOutput;
 use This\ORM\Migrations\Registry\RegistrySchema;
 use This\ORM\Migrations\Schema\SchemaBuilder;
 use This\ORM\Migrations\Schema\SchemaCommandCollector;
-use This\ORM\Migrations\Schema\TableBuilder;
+use This\ORM\Migrations\Schema\TableDefinition;
 use This\ORM\Migrations\Schema\TableCommandCollector;
 use This\ORM\ORMInterface;
 use This\ORM\Query\Insert;
 use This\ORM\Query\Select;
+use This\ORM\Query\Update;
+use This\Output\CLI\CLIMarkupRenderer;
+use This\Output\CLI\CLIOutput;
 
 final readonly class Migrator
 {
@@ -55,6 +57,7 @@ final readonly class Migrator
             match ($action) {
                 'create' => $this->create(),
                 'migrate' => $this->migrate(),
+                'fix' => $this->fix(),
                 default => $this->output->error("Unknown action: <b>{$action}</b>"),
             };
         } catch (\Throwable $e) {
@@ -69,7 +72,7 @@ final readonly class Migrator
         $this->output->confirmOrAbort('Are you sure you want to create a new migration?');
         $this->output->info('Generating migration file...');
 
-        $name = $this->request->getAttribute('name', $this->request->getAttribute(0));
+        $name = $this->request->getAttribute('name', $this->request->getAttribute(0)) ?? 'auto_generated';
         $time = (new \DateTimeImmutable())->format('YmdHis');
 
         $code = file_get_contents(__DIR__ . '/../Stubs/Migration.stub');
@@ -85,7 +88,7 @@ final readonly class Migrator
      */
     private function migrate(): void
     {
-        $this->output->line('');
+        $this->output->line();
         $this->output->confirmOrAbort('Are you sure you want to migrate the database?');
         $this->checkMigrationsRegistry();
 
@@ -120,6 +123,8 @@ final readonly class Migrator
         }
 
         foreach ($migrations as $migrationFile) {
+            $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
+
             if (isset($appliedMap[$migrationFile])) {
                 $checksum = hash('sha256', file_get_contents("{$this->migrationsPath}/{$migrationFile}.php"));
 
@@ -130,7 +135,7 @@ final readonly class Migrator
                     $this->output->error("This usually means migration was modified after execution.");
                     $this->output->info("You can fix this by running: <b>/migration/fix --version={$migrationFile}</b>");
                     $this->output->error("Aborting migration execution.");
-                    $this->output->line('');
+                    $this->output->line();
 
                     exit(1);
                 }
@@ -145,12 +150,11 @@ final readonly class Migrator
             if ($migration->draft()) {
                 $this->output->error("Migration <u><b>{$migrationFile}</b></u> is marked as draft and cannot be applied. <b><u>Reason:</u></b> {$migration->draftReason()}");
                 $this->output->error('Aborting migration execution.');
-                $this->output->line('');
+                $this->output->line();
 
                 exit(1);
             }
 
-            $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
             $this->output->info("Applying migration: <b>{$migrationFile}</b>...");
 
             $commandCollector = new SchemaCommandCollector();
@@ -158,12 +162,12 @@ final readonly class Migrator
             $start = microtime(true);
             $migration->up($schemaBuilder);
 
-            foreach ($commandCollector->getCommands() as $expression) {
-                if ($expression->getDescription()) {
-                    $this->output->info($expression->getDescription());
+            foreach ($commandCollector->getCommands() as $command) {
+                if ($command->getDescription()) {
+                    $this->output->info($command->getDescription());
                 }
 
-                $this->orm->rawSql($this->compiler->compile($expression));
+                $this->orm->rawSql($this->compiler->compile($command));
             }
 
             $end = microtime(true);
@@ -179,18 +183,69 @@ final readonly class Migrator
         }
         $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
         $this->output->success('<b>All migrations have been applied successfully.</b>');
-        $this->output->line('');
+        $this->output->line();
+    }
+
+    private function fix(): void
+    {
+        $version = $this->request->getAttribute('version');
+        $this->output->confirmOrAbort("Are you sure you want to fix migration <b>{$version}</b> checksum?");
+
+        if (!file_exists("{$this->migrationsPath}/{$version}.php")) {
+            $this->output->error("Migration file <b>{$version}.php</b> does not exist.");
+            $this->output->line();
+
+            exit(1);
+        }
+
+        $query = Select::from(RegistrySchema::class)->where(Expr::equal('version', $version));
+        $migration = $this->orm->query($query)->first();
+
+        if (!$migration) {
+            $this->output->error("Migration <b>{$version}</b> is not applied yet.");
+            $this->output->line();
+
+            exit(1);
+        }
+
+        $checksum = hash('sha256', file_get_contents("{$this->migrationsPath}/{$version}.php"));
+
+        if ($checksum === $migration['checksum']) {
+            $this->output->success("Migration <b>{$version}</b> checksum is up to date.");
+            $this->output->line();
+
+            exit(1);
+        }
+
+        $this->output->info("Current checksum: <b>{$migration['checksum']}</b>");
+        $this->output->info("New checksum: <b>{$checksum}</b>");
+
+        $query = Update::table(RegistrySchema::class)
+            ->set(['checksum' => $checksum])
+            ->where(Expr::equal('version', $version))
+        ;
+
+        if (!$this->orm->query($query)->execute()) {
+            $this->output->error("Failed to update checksum for migration <b>{$version}</b>.");
+            $this->output->line();
+
+            exit(1);
+        }
+
+        $this->output->success("Checksum for migration <b>{$version}</b> has been updated successfully.");
+        $this->output->line();
     }
 
     /**
      * @throws \Exception
      */
-    public function checkMigrationsRegistry(): void
+    private function checkMigrationsRegistry(): void
     {
         $result = $this->orm->rawSql('SHOW TABLES LIKE "migrations"');
 
         if ($result === [] && !$this->createMigrationsRegistry()) {
             $this->output->error('Migrations registry table is not found and cannot be created.');
+            $this->output->line();
 
             exit(1);
         }
@@ -205,7 +260,7 @@ final readonly class Migrator
 
         $collector = new TableCommandCollector();
 
-        $table = new TableBuilder('migrations', $collector);
+        $table = new TableDefinition('migrations', $collector);
         $table->addColumn('id')->int()->autoIncrement()->primary();
         $table->addColumn('version')->string();
         $table->addColumn('checksum')->string(64);

@@ -7,8 +7,7 @@ declare(strict_types=1);
 
 namespace This\ORM\Migrations\Schema;
 
-use This\ORM\Migrations\Command\CreateForeignKeyCommand;
-use This\ORM\Migrations\Command\CreateIndexCommand;
+use This\ORM\Migrations\Command\AlterTableCommand;
 use This\ORM\Migrations\Command\CreateTableCommand;
 
 final class SchemaBuilder implements SchemaBuilderInterface
@@ -20,6 +19,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     private bool $rollbackable = true;
 
+    /**
+     * @throws \Exception
+     */
     public function createTable(string $name, callable $definition): void
     {
         if ($this->rollbackable) {
@@ -27,40 +29,36 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         $collector = new TableCommandCollector();
-        $table = new TableBuilder($name, $collector);
-        $definition($table);
+        $tableBuilder = new TableDefinition($name, $collector);
+        $definition($tableBuilder);
 
-        $this->commandCollector->add(new CreateTableCommand($table));
+        $this->commandCollector->add(new CreateTableCommand($tableBuilder));
     }
 
-    public function createIndex(string $table, array $columns): CreateIndexCommand
-    {
-        $command = new CreateIndexCommand($table, $columns);
-        $this->commandCollector->add($command);
-
-        return $command;
-    }
-
-    public function createForeignKey(
-        string $table,
-        string $column,
-        string $referenceTable,
-        string $referenceColumn
-    ): CreateForeignKeyCommand {
-        $command = new CreateForeignKeyCommand($table, $column, $referenceTable, $referenceColumn);
-        $this->commandCollector->add($command);
-
-        return $command;
-    }
-
+    /**
+     * @throws \Exception
+     */
     public function dropTable(string $name): void
     {
-
+        if ($this->rollbackable) {
+            throw new \Exception('You have to explicitly call nonRollBack() method to drop a table.');
+        }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function table(string $name, callable $definition): void
     {
+        if ($this->rollbackable) {
+            throw new \Exception('You have to explicitly call nonRollBack() method to alter a table.');
+        }
 
+        $collector = new TableCommandCollector();
+        $tableBuilder = new TableDefinition($name, $collector);
+        $definition($tableBuilder);
+
+        $this->commandCollector->add(new AlterTableCommand($tableBuilder));
     }
 
     public function nonRollBack(): SchemaBuilderInterface

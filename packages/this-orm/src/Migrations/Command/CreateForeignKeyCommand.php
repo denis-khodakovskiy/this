@@ -11,6 +11,8 @@ use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
 final class CreateForeignKeyCommand implements MigrationCommandInterface
 {
+    private string $name;
+
     private string $onDelete = 'NO ACTION';
 
     private string $onUpdate = 'NO ACTION';
@@ -21,6 +23,7 @@ final class CreateForeignKeyCommand implements MigrationCommandInterface
         private readonly string $referenceTable,
         private readonly string $referenceColumn,
     ) {
+        $this->name = sprintf('fk_%s_%s_%s_%s', $table, $column, $referenceTable, $referenceColumn);
     }
 
     public function onDelete(string $onDelete): self
@@ -67,11 +70,25 @@ final class CreateForeignKeyCommand implements MigrationCommandInterface
         return $this->onUpdate;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function name(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return sprintf(
-            'Create foreign key <b>%s</b>.<b>%s</b> reference to <b>%s</b>.<b>%s</b>',
-            $this->table, $this->column, $this->referenceTable, $this->referenceColumn,
+            'Creating foreign key <b>%s</b> reference to <b>%s</b>.<b>%s</b>',
+            $this->column,
+            $this->referenceTable,
+            $this->referenceColumn,
         );
     }
 }

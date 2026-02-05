@@ -9,11 +9,11 @@ namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
-final readonly class DropColumnCommand implements MigrationCommandInterface
+final readonly class DropForeignKeyCommand implements MigrationCommandInterface
 {
     public function __construct(
         private string $tableName,
-        private string $column,
+        private string $foreignKeyName,
     ) {
     }
 
@@ -22,13 +22,13 @@ final readonly class DropColumnCommand implements MigrationCommandInterface
         return $this->tableName;
     }
 
-    public function getColumn(): string
+    public function getForeignKeyName(): string
     {
-        return $this->column;
+        return $this->foreignKeyName;
     }
 
     public function getDescription(): ?string
     {
-        return sprintf('Dropping column <b>%s</b>', $this->column);
+        return "Dropping foreign key <b>$this->foreignKeyName</b>";
     }
 }

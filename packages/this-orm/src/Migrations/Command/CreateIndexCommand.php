@@ -57,6 +57,9 @@ final class CreateIndexCommand implements MigrationCommandInterface
 
     public function getDescription(): ?string
     {
-        return sprintf('Creating index <b>%s</b> on table <b>%s (%s)</b>', $this->name, $this->table, implode(', ', $this->columns));
+        return sprintf(
+            'Creating index <b>(%s)</b>',
+            implode(', ', $this->columns),
+        );
     }
 }

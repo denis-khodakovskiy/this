@@ -8,17 +8,17 @@ declare(strict_types=1);
 namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
+use This\ORM\Migrations\Schema\TableDefinition;
 
-final readonly class CreatePrimaryKeyCommand implements MigrationCommandInterface
+final readonly class AlterTableCommand implements MigrationCommandInterface
 {
     public function __construct(
-        public string $table,
-        public array $columns,
+        public TableDefinition $tableDefinition,
     ) {
     }
 
     public function getDescription(): ?string
     {
-        return null;
+        return "Altering table <b>{$this->tableDefinition->getTableName()}</b> table";
     }
 }

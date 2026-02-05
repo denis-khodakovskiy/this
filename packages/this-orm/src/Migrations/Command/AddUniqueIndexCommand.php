@@ -9,12 +9,12 @@ namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
-final class AddUniqueCommand implements MigrationCommandInterface
+final class AddUniqueIndexCommand implements MigrationCommandInterface
 {
     private ?string $name = null;
 
     public function __construct(
-        private readonly string $table,
+        private readonly string $tableName,
         private readonly array $columns,
     ) {
     }
@@ -24,9 +24,9 @@ final class AddUniqueCommand implements MigrationCommandInterface
         return $this->columns;
     }
 
-    public function getTable(): string
+    public function getTableName(): string
     {
-        return $this->table;
+        return $this->tableName;
     }
 
     public function name(string $name): self
@@ -43,6 +43,10 @@ final class AddUniqueCommand implements MigrationCommandInterface
 
     public function getDescription(): ?string
     {
-        return null;
+        return sprintf(
+            'Adding unique index <b>%s</b> for columns <b>%s</b>',
+            $this->name,
+            implode(', ', $this->columns)
+        );
     }
 }

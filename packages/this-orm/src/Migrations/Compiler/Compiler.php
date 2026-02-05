@@ -8,78 +8,124 @@ declare(strict_types=1);
 namespace This\ORM\Migrations\Compiler;
 
 use This\ORM\Migrations\Command\AddColumnCommand;
+use This\ORM\Migrations\Command\AddUniqueIndexCommand;
+use This\ORM\Migrations\Command\AlterTableCommand;
+use This\ORM\Migrations\Command\AlterColumnCommand;
 use This\ORM\Migrations\Command\CreateForeignKeyCommand;
 use This\ORM\Migrations\Command\CreateIndexCommand;
-use This\ORM\Migrations\Command\CreatePrimaryKeyCommand;
+use This\ORM\Migrations\Command\AddPrimaryKeyCommand;
 use This\ORM\Migrations\Command\CreateTableCommand;
+use This\ORM\Migrations\Command\DropColumnCommand;
+use This\ORM\Migrations\Command\DropForeignKeyCommand;
+use This\ORM\Migrations\Command\DropIndexCommand;
+use This\ORM\Migrations\Command\DropPrimaryKeyCommand;
+use This\ORM\Migrations\Command\DropTableCommand;
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
 final class Compiler
 {
-    public function compile(MigrationCommandInterface $expression): string
+    public function compile(MigrationCommandInterface $command): string
     {
         return match (true) {
-            $expression instanceof CreateTableCommand => $this->createTable($expression),
-            $expression instanceof AddColumnCommand => $this->addColumn($expression),
-            $expression instanceof CreateIndexCommand => $this->createIndex($expression),
-            $expression instanceof CreatePrimaryKeyCommand => $this->createPrimaryKey($expression),
-            $expression instanceof CreateForeignKeyCommand => $this->createForeignKey($expression),
+            $command instanceof AlterTableCommand => $this->alterTable($command),
+            $command instanceof CreateTableCommand => $this->createTable($command),
+            //$command instanceof DropTableCommand => $this->dropTable($command),
+
+            $command instanceof AddColumnCommand => $this->addColumn($command),
+            $command instanceof AddPrimaryKeyCommand => $this->createPrimaryKey($command),
+            $command instanceof AddUniqueIndexCommand => $this->addUniqueIndex($command),
+            $command instanceof AlterColumnCommand => $this->changeColumnType($command),
+            $command instanceof CreateForeignKeyCommand => $this->createForeignKey($command),
+            $command instanceof CreateIndexCommand => $this->createIndex($command),
+            $command instanceof DropColumnCommand => $this->dropColumn($command),
+            $command instanceof DropForeignKeyCommand => $this->dropForeignKey($command),
+            $command instanceof DropIndexCommand => $this->dropIndex($command),
+            $command instanceof DropPrimaryKeyCommand => $this->dropPrimaryKey($command),
         };
     }
 
-    private function createTable(CreateTableCommand $expression): string
+    private function createTable(CreateTableCommand $command): string
     {
-        return sprintf(
+        $sql = sprintf(
             "CREATE TABLE `%s` (\n%s\n)",
-            $expression->tableBuilder->getName(),
+            $command->tableDefinition->getTableName(),
             implode(",\n", array_map(
-                fn (MigrationCommandInterface $expression) => $this->compile($expression),
-                $expression->tableBuilder->getCollector()->getCommands(),
+                fn (MigrationCommandInterface $expression) => $this->compile($command),
+                array_filter(
+                    $command->tableDefinition->getCollector()->getCommands(),
+                    fn (MigrationCommandInterface $expression) => $expression instanceof AddColumnCommand,
+                ),
             )),
         );
+
+        if ($command->tableDefinition->getEngine()) {
+             $sql .= sprintf(" ENGINE = %s", $command->tableDefinition->getEngine());
+        }
+
+        if ($command->tableDefinition->getCharset()) {
+            $sql .= sprintf(" DEFAULT CHARSET = %s", $command->tableDefinition->getCharset());
+        }
+
+        if ($command->tableDefinition->getCollation()) {
+            $sql .= sprintf(" COLLATE = %s", $command->tableDefinition->getCollation());
+        }
+
+        if ($command->tableDefinition->getComment()) {
+            $sql .= sprintf(" COMMENT = '%s'", $command->tableDefinition->getComment());
+        }
+
+        return $sql;
     }
 
-    private function addColumn(AddColumnCommand $expression): string
+    public function alterTable(AlterTableCommand $command): string
     {
-        $type = $this->mapType($expression->getType());
+        return implode("\n", array_filter([
+            "ALTER TABLE `{$command->tableDefinition->getTableName()}`",
+            $command->tableDefinition->getNewName() ? "RENAME TO `{$command->tableDefinition->getNewName()}`" : null,
+            $command->tableDefinition->getComment() ? "COMMENT = '{$command->tableDefinition->getComment()}'": null,
+            $command->tableDefinition->getCharset() ? "DEFAULT CHARSET = {$command->tableDefinition->getCharset()}": null,
+            $command->tableDefinition->getCollation() ? "COLLATE = {$command->tableDefinition->getCollation()}": null,
+            $command->tableDefinition->getEngine() ? "ENGINE = {$command->tableDefinition->getEngine()}": null,
+        ]));
+    }
+
+    private function addColumn(AddColumnCommand $command): string
+    {
+        $type = $this->mapType($command->getColumnDefinition()->getType());
 
         $parts = [
-            "`{$expression->getName()}`",
+            "`{$command->getColumnDefinition()->getName()}`",
             mb_strtoupper(
-                $expression->getLength()
-                    ? "{$type}({$expression->getLength()})"
+                $command->getColumnDefinition()->getLength()
+                    ? "{$type}({$command->getColumnDefinition()->getLength()})"
                     : $type,
             ),
         ];
 
-        if ($expression->getCollation()) {
-            $parts[] = "COLLATE {$expression->getCollation()}";
+        if ($command->getColumnDefinition()->getCollation()) {
+            $parts[] = "COLLATE {$command->getColumnDefinition()->getCollation()}";
         }
 
-        if (!$expression->isNullable()) {
+        if (!$command->getColumnDefinition()->isNullable()) {
             $parts[] = 'NOT NULL';
         }
 
-        if ($expression->isAutoIncrement()) {
+        if ($command->getColumnDefinition()->isAutoIncrement()) {
             $parts[] = 'AUTO_INCREMENT';
         }
 
-        if ($expression->isPrimary()) {
-            $parts[] = 'PRIMARY KEY';
+        if ($command->getColumnDefinition()->getDefaultValue()) {
+            $parts[] = 'DEFAULT ' . is_string($command->getColumnDefinition()->getDefaultValue())
+                ? "'{$command->getColumnDefinition()->getDefaultValue()}'"
+                : $command->getColumnDefinition()->getDefaultValue();
         }
 
-        if ($expression->getDefaultValue()) {
-            $parts[] = 'DEFAULT ' . is_string($expression->getDefaultValue())
-                ? "'{$expression->getDefaultValue()}'"
-                : $expression->getDefaultValue();
+        if ($command->getColumnDefinition()->getDefaultExpression()) {
+            $parts[] = "DEFAULT {$command->getColumnDefinition()->getDefaultExpression()}";
         }
 
-        if ($expression->getDefaultExpression()) {
-            $parts[] = "DEFAULT {$expression->getDefaultExpression()}";
-        }
-
-        if ($expression->getComment()) {
-            $parts[] = "COMMENT '{$expression->getComment()}'";
+        if ($command->getColumnDefinition()->getComment()) {
+            $parts[] = "COMMENT '{$command->getColumnDefinition()->getComment()}'";
         }
 
         return implode(' ', $parts);
@@ -105,18 +151,94 @@ final class Compiler
         ]);
     }
 
-    private function createPrimaryKey(CreatePrimaryKeyCommand $expression): string
+    private function createPrimaryKey(AddPrimaryKeyCommand $expression): string
     {
-        return "ALTER TABLE `{$expression->table}` ADD PRIMARY KEY (" . implode(', ', $expression->columns) . ")";
+        return "ALTER TABLE `{$expression->table}` ADD PRIMARY KEY (" . implode(', ', $expression->getColumns()) . ")";
     }
 
     private function createForeignKey(CreateForeignKeyCommand $expression): string
     {
         $sql = "ALTER TABLE `{$expression->getTable()}` ADD CONSTRAINT FOREIGN KEY (`{$expression->getColumn()}`)";
         $sql .= " REFERENCES `{$expression->getReferenceTable()}` (`{$expression->getReferenceColumn()}`)";
-        $sql .= " ON DELETE {$expression->getOnDelete()} ON UPDATE {$expression->getOnUpdate()};";
+        $sql .= " ON DELETE {$expression->getOnDelete()} ON UPDATE {$expression->getOnUpdate()}";
 
         return $sql;
+    }
+
+    public function addUniqueIndex(AddUniqueIndexCommand $command): string
+    {
+        $columnsList = implode(', ', array_map(
+            fn (string $columnName) => "`{$columnName}`",
+            $command->getColumns(),
+        ));
+
+        return "CREATE UNIQUE INDEX `{$command->getName()}` ON `{$command->getTableName()}` ({$columnsList})";
+    }
+
+    public function changeColumnType(AlterColumnCommand $command): string
+    {
+        $type = $this->mapType($command->getColumnDefinition()->getType());
+
+        $parts = [
+            'ALTER TABLE',
+            "`{$command->getTableName()}`",
+            'CHANGE COLUMN',
+            "`{$command->getColumnDefinition()->getName()}`",
+            "`{$command->getColumnDefinition()->getNewName()}`",
+            mb_strtoupper(
+                $command->getColumnDefinition()->getLength()
+                    ? "{$type}({$command->getColumnDefinition()->getLength()})"
+                    : $type,
+            ),
+        ];
+
+        if ($command->getColumnDefinition()->getCollation()) {
+            $parts[] = "COLLATE {$command->getColumnDefinition()->getCollation()}";
+        }
+
+        if (!$command->getColumnDefinition()->isNullable()) {
+            $parts[] = 'NOT NULL';
+        }
+
+        if ($command->getColumnDefinition()->isAutoIncrement()) {
+            $parts[] = 'AUTO_INCREMENT';
+        }
+
+        if ($command->getColumnDefinition()->getDefaultValue()) {
+            $parts[] = 'DEFAULT ' . is_string($command->getColumnDefinition()->getDefaultValue())
+                ? "'{$command->getColumnDefinition()->getDefaultValue()}'"
+                : $command->getColumnDefinition()->getDefaultValue();
+        }
+
+        if ($command->getColumnDefinition()->getDefaultExpression()) {
+            $parts[] = "DEFAULT {$command->getColumnDefinition()->getDefaultExpression()}";
+        }
+
+        if ($command->getColumnDefinition()->getComment()) {
+            $parts[] = "COMMENT '{$command->getColumnDefinition()->getComment()}'";
+        }
+
+        return implode(' ', array_filter($parts));
+    }
+
+    public function dropColumn(DropColumnCommand $command): string
+    {
+        return "ALTER TABLE `{$command->getTableName()}` DROP COLUMN `{$command->getColumn()}`";
+    }
+
+    public function dropForeignKey(DropForeignKeyCommand $command): string
+    {
+        return "ALTER TABLE `{$command->getTableName()}` DROP FOREIGN KEY `{$command->getForeignKeyName()}`";
+    }
+
+    public function dropIndex(DropIndexCommand $command): string
+    {
+        return "DROP INDEX `{$command->getIndexName()}` ON `{$command->getTableName()}`";
+    }
+
+    public function dropPrimaryKey(DropPrimaryKeyCommand $command): string
+    {
+        return "ALTER TABLE `{$command->tableName}` DROP PRIMARY KEY";
     }
 
     private function mapType(string $type): string

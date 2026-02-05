@@ -8,17 +8,17 @@ declare(strict_types=1);
 namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
-use This\ORM\Migrations\Schema\TableBuilder;
+use This\ORM\Migrations\Schema\TableDefinition;
 
 final readonly class CreateTableCommand implements MigrationCommandInterface
 {
     public function __construct(
-        public TableBuilder $tableBuilder,
+        public TableDefinition $tableDefinition,
     ) {
     }
 
     public function getDescription(): ?string
     {
-        return "Creating {$this->tableBuilder->getName()} table";
+        return "Creating <b>{$this->tableDefinition->getTableName()}</b> table";
     }
 }

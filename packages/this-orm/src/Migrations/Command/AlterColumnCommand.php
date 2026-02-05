@@ -9,12 +9,17 @@ namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
-final readonly class DropIndexCommand implements MigrationCommandInterface
+final readonly class AlterColumnCommand implements MigrationCommandInterface
 {
     public function __construct(
         private string $tableName,
-        private string $indexName,
+        private ColumnDefinition $columnDefinition,
     ) {
+    }
+
+    public function getColumnDefinition(): ColumnDefinition
+    {
+        return $this->columnDefinition;
     }
 
     public function getTableName(): string
@@ -22,16 +27,11 @@ final readonly class DropIndexCommand implements MigrationCommandInterface
         return $this->tableName;
     }
 
-    public function getIndexName(): string
-    {
-        return $this->indexName;
-    }
-
     public function getDescription(): ?string
     {
         return sprintf(
-            'Dropping index <b>%s</b>',
-            $this->tableName,
+            'Altering column <b>%s</b>',
+            $this->getColumnDefinition()->getName(),
         );
     }
 }

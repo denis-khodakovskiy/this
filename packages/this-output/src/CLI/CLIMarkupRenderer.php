@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace This\ORM\Migrations\Output;
+namespace This\Output\CLI;
 
 final class CLIMarkupRenderer
 {

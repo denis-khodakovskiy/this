@@ -9,24 +9,15 @@ namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
 
-final readonly class AddPrimaryKeyCommand implements MigrationCommandInterface
+final readonly class DropPrimaryKeyCommand implements MigrationCommandInterface
 {
     public function __construct(
         public string $tableName,
-        private array $columns,
     ) {
-    }
-
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 
     public function getDescription(): ?string
     {
-        return sprintf(
-            "Adding primary key to <b>(%s)</b>",
-            implode(', ', $this->columns),
-        );
+        return 'Dropping primary key';
     }
 }

@@ -93,6 +93,13 @@
       "options": {
         "symlink": true
       }
+    },
+    {
+      "type": "path",
+      "url": "./packages/this-output",
+      "options": {
+        "symlink": true
+      }
     }
   ],
 
