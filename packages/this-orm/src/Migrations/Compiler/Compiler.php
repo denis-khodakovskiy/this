@@ -50,7 +50,7 @@ final class Compiler
             "CREATE TABLE `%s` (\n%s\n)",
             $command->tableDefinition->getTableName(),
             implode(",\n", array_map(
-                fn (MigrationCommandInterface $expression) => $this->compile($command),
+                fn (MigrationCommandInterface $command) => $this->compile($command),
                 array_filter(
                     $command->tableDefinition->getTableCommandCollector()->getCommands(),
                     fn (MigrationCommandInterface $expression) => $expression instanceof AddColumnCommand,
@@ -108,6 +108,10 @@ final class Compiler
 
         if (!$command->getColumnDefinition()->isNullable()) {
             $parts[] = 'NOT NULL';
+        }
+
+        if ($command->getColumnDefinition()->isPrimary()) {
+            $parts[] = ' PRIMARY KEY';
         }
 
         if ($command->getColumnDefinition()->isAutoIncrement()) {
@@ -191,6 +195,10 @@ final class Compiler
                     : $type,
             ),
         ];
+
+        if ($command->getColumnDefinition()->isPrimary()) {
+            $parts[] = ' PRIMARY KEY';
+        }
 
         if ($command->getColumnDefinition()->getCollation()) {
             $parts[] = "COLLATE {$command->getColumnDefinition()->getCollation()}";

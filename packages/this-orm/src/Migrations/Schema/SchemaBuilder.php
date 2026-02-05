@@ -28,11 +28,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
             throw new \Exception('You have to explicitly call nonRollBack() method to create a table.');
         }
 
-        $collector = new TableCommandCollector();
-        $tableBuilder = new TableBuilder($name, $collector);
+        $tableCollector = new TableCommandCollector();
+        $schemaCollector = new SchemaCommandCollector();
+        $tableBuilder = new TableBuilder($name, $tableCollector, $schemaCollector);
         $definition($tableBuilder);
 
         $this->commandCollector->addCommand(new CreateTableCommand($tableBuilder));
+
+        foreach ($schemaCollector->getCommands() as $command) {
+            $this->commandCollector->addCommand($command);
+        }
     }
 
     /**
@@ -54,11 +59,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
             throw new \Exception('You have to explicitly call nonRollBack() method to alter a table.');
         }
 
-        $collector = new TableCommandCollector();
-        $tableBuilder = new TableBuilder($name, $collector);
+        $tableCollector = new TableCommandCollector();
+        $schemaCollector = new SchemaCommandCollector();
+        $tableBuilder = new TableBuilder($name, $tableCollector, $schemaCollector);
         $definition($tableBuilder);
 
         $this->commandCollector->addCommand(new AlterTableCommand($tableBuilder));
+
+        foreach ($schemaCollector->getCommands() as $command) {
+            $this->commandCollector->addCommand($command);
+        }
     }
 
     public function nonRollBack(): SchemaBuilderInterface

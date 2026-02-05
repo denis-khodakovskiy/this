@@ -167,9 +167,7 @@ final readonly class Migrator
                     $this->output->info($command->getDescription());
                 }
 
-                $this->output->line($this->compiler->compile($command));
-
-                //$this->orm->rawSql($this->compiler->compile($command));
+                $this->orm->rawSql($this->compiler->compile($command));
             }
 
             $end = microtime(true);
@@ -181,7 +179,7 @@ final readonly class Migrator
                 'checksum' => hash('sha256', file_get_contents("{$this->migrationsPath}/{$migrationFile}.php")),
                 'execution_time' => $executionTime,
             ]);
-            //$this->orm->query($query)->execute();
+            $this->orm->query($query)->execute();
         }
         $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
         $this->output->success('<b>All migrations have been applied successfully.</b>');

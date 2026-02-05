@@ -125,7 +125,7 @@ final class TableBuilder
         $this->addColumn('deletedAt')->dateTime()->nullable();
     }
 
-    public function collation(string $collation): self
+    public function collation(?string $collation): self
     {
         $this->collation = $collation;
 
@@ -149,7 +149,7 @@ final class TableBuilder
         return $this->engine;
     }
 
-    public function charset(string $charset): self
+    public function charset(?string $charset): self
     {
         $this->charset = $charset;
 
