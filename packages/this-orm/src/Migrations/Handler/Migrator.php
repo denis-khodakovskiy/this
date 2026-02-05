@@ -19,6 +19,7 @@ use This\ORM\Migrations\Schema\SchemaCommandCollector;
 use This\ORM\Migrations\Schema\TableBuilder;
 use This\ORM\Migrations\Schema\TableCommandCollector;
 use This\ORM\ORMInterface;
+use This\ORM\Query\Delete;
 use This\ORM\Query\Insert;
 use This\ORM\Query\Select;
 use This\ORM\Query\Update;
@@ -58,6 +59,7 @@ final readonly class Migrator
                 'create' => $this->create(),
                 'migrate' => $this->migrate(),
                 'fix' => $this->fix(),
+                'rollback' => $this->rollback(),
                 default => $this->output->error("Unknown action: <b>{$action}</b>"),
             };
         } catch (\Throwable $e) {
@@ -122,6 +124,8 @@ final readonly class Migrator
             $this->output->confirmOrAbort('These migrations were applied earlier, but are missing in the filesystem.');
         }
 
+        $totalTime = 0;
+
         foreach ($migrations as $migrationFile) {
             $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
 
@@ -180,9 +184,12 @@ final readonly class Migrator
                 'execution_time' => $executionTime,
             ]);
             $this->orm->query($query)->execute();
+
+            $totalTime += $executionTime;
         }
+
         $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
-        $this->output->success('<b>All migrations have been applied successfully.</b>');
+        $this->output->success("<b>All migrations have been applied successfully in {$totalTime} ms</b>");
         $this->output->line();
     }
 
@@ -234,6 +241,76 @@ final readonly class Migrator
 
         $this->output->success("Checksum for migration <b>{$version}</b> has been updated successfully.");
         $this->output->line();
+    }
+
+    public function rollback(): void
+    {
+        $this->output->confirmOrAbort('Are you sure you want to rollback the database?');
+        $amount = $this->request->getAttribute('n', $this->request->getAttribute(0));
+
+        if ($amount === null) {
+            $this->output->error('Please specify the number of migrations to rollback using --n=N flag');
+            $this->output->line();
+        }
+
+        $migrationsToRollback = $this->orm->query(
+            Select::from(RegistrySchema::class)
+                ->orderBy(['id' => 'DESC'])
+                ->limit((int) $amount)
+        )->execute();
+
+        $this->output->warning('You are about to rollback the following migrations:');
+
+        foreach ($migrationsToRollback as $migration) {
+            $this->output->warning($migration['version']);
+        }
+
+        if (!$this->output->confirm('Continue? [y/n]')) {
+            $this->output->success('Rollback aborted by user');
+            $this->output->line();
+
+            exit(1);
+        }
+
+        $totalTime = 0;
+
+        foreach ($migrationsToRollback as $migrationData) {
+            require_once "{$this->migrationsPath}/{$migrationData['version']}.php";
+            $migration = new $migrationData['version']();
+
+            assert($migration instanceof Migration);
+
+            $schemaBuilder = new SchemaBuilder(new SchemaCommandCollector());
+
+            $commandCollector = new SchemaCommandCollector();
+            $schemaBuilder = new SchemaBuilder($commandCollector);
+            $start = microtime(true);
+            $migration->down($schemaBuilder);
+
+            foreach ($commandCollector->getCommands() as $command) {
+                if ($command->getDescription()) {
+                    $this->output->info($command->getDescription());
+                }
+
+                $this->output->line($this->compiler->compile($command));
+
+                //$this->orm->rawSql($this->compiler->compile($command));
+            }
+
+            $end = microtime(true);
+            $executionTime = round(($end - $start) * 1000);
+            //$this->orm->query(Delete::from(RegistrySchema::class)->where(Expr::equal('id', $migration['id'])))->execute();
+
+            $this->output->success("Migration <u>{$migrationData['version']}</u> has been rolled back successfully in {$executionTime}ms.");
+
+            $totalTime += $executionTime;
+        }
+
+        $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
+        $this->output->success("<b>All selected migrations have been rolled back successfully in {$totalTime} ms</b>");
+        $this->output->line();
+
+        exit(1);
     }
 
     /**

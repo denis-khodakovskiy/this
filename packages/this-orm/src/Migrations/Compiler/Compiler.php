@@ -29,7 +29,7 @@ final class Compiler
         return match (true) {
             $command instanceof AlterTableCommand => $this->alterTable($command),
             $command instanceof CreateTableCommand => $this->createTable($command),
-            //$command instanceof DropTableCommand => $this->dropTable($command),
+            $command instanceof DropTableCommand => $this->dropTable($command),
 
             $command instanceof AddColumnCommand => $this->addColumn($command),
             $command instanceof AddPrimaryKeyCommand => $this->createPrimaryKey($command),
@@ -77,7 +77,7 @@ final class Compiler
         return $sql;
     }
 
-    public function alterTable(AlterTableCommand $command): string
+    private function alterTable(AlterTableCommand $command): string
     {
         return implode("\n", array_filter([
             "ALTER TABLE `{$command->tableDefinition->getTableName()}`",
@@ -169,7 +169,7 @@ final class Compiler
         return $sql;
     }
 
-    public function addUniqueIndex(AddUniqueIndexCommand $command): string
+    private function addUniqueIndex(AddUniqueIndexCommand $command): string
     {
         $columnsList = implode(', ', array_map(
             fn (string $columnName) => "`{$columnName}`",
@@ -179,7 +179,7 @@ final class Compiler
         return "CREATE UNIQUE INDEX `{$command->getName()}` ON `{$command->getTableName()}` ({$columnsList})";
     }
 
-    public function changeColumnType(AlterColumnCommand $command): string
+    private function changeColumnType(AlterColumnCommand $command): string
     {
         $type = $this->mapType($command->getColumnDefinition()->getType());
 
@@ -229,24 +229,29 @@ final class Compiler
         return implode(' ', array_filter($parts));
     }
 
-    public function dropColumn(DropColumnCommand $command): string
+    private function dropColumn(DropColumnCommand $command): string
     {
         return "ALTER TABLE `{$command->getTableName()}` DROP COLUMN `{$command->getColumn()}`";
     }
 
-    public function dropForeignKey(DropForeignKeyCommand $command): string
+    private function dropForeignKey(DropForeignKeyCommand $command): string
     {
         return "ALTER TABLE `{$command->getTableName()}` DROP FOREIGN KEY `{$command->getForeignKeyName()}`";
     }
 
-    public function dropIndex(DropIndexCommand $command): string
+    private function dropIndex(DropIndexCommand $command): string
     {
         return "DROP INDEX `{$command->getIndexName()}` ON `{$command->getTableName()}`";
     }
 
-    public function dropPrimaryKey(DropPrimaryKeyCommand $command): string
+    private function dropPrimaryKey(DropPrimaryKeyCommand $command): string
     {
         return "ALTER TABLE `{$command->tableName}` DROP PRIMARY KEY";
+    }
+
+    private function dropTable(DropTableCommand $command): string
+    {
+        return "DROP TABLE `{$command->tableName}`";
     }
 
     private function mapType(string $type): string
