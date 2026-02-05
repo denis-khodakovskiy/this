@@ -19,7 +19,7 @@ use This\ORM\Migrations\Command\DropForeignKeyCommand;
 use This\ORM\Migrations\Command\DropIndexCommand;
 use This\ORM\Migrations\Command\DropPrimaryKeyCommand;
 
-final class TableDefinition
+final class TableBuilder
 {
     private string $collation = 'utf8mb4_general_ci';
 
@@ -33,7 +33,8 @@ final class TableDefinition
 
     public function __construct(
         private readonly string $tableName,
-        private readonly TableCommandCollector $collector
+        private readonly TableCommandCollector $tableCommandCollector,
+        private readonly SchemaCommandCollector $schemaCommandCollector,
     ) {
     }
 
@@ -41,20 +42,20 @@ final class TableDefinition
     {
         $columnDefinition = new ColumnDefinition($columnName);
         $command = new AddColumnCommand($this->tableName, $columnDefinition);
-        $this->collector->addCommand($command);
+        $this->tableCommandCollector->addCommand($command);
 
         return $columnDefinition;
     }
 
-    public function addPrimaryKey(array $columns): void
+    public function addPrimaryKey(string ...$columns): void
     {
-        $this->collector->addCommand(new AddPrimaryKeyCommand($this->tableName, $columns));
+        $this->schemaCommandCollector->addCommand(new AddPrimaryKeyCommand($this->tableName, $columns));
     }
 
-    public function addUniqueIndex(array $columns): AddUniqueIndexCommand
+    public function addUniqueIndex(string ...$columns): AddUniqueIndexCommand
     {
         $command = new AddUniqueIndexCommand($this->tableName, $columns);
-        $this->collector->addCommand($command);
+        $this->schemaCommandCollector->addCommand($command);
 
         return $command;
     }
@@ -63,49 +64,48 @@ final class TableDefinition
     {
         $columnDefinition = $this->addColumn($columnName);
         $command = new AlterColumnCommand($this->tableName, $columnDefinition);
-        $this->collector->addCommand($command);
+        $this->schemaCommandCollector->addCommand($command);
 
         return $columnDefinition;
     }
 
     public function createForeignKey(
-        string $table,
         string $column,
         string $foreignTable,
         string $foreignColumn,
     ): CreateForeignKeyCommand {
-        $command = new CreateForeignKeyCommand($table, $column, $foreignTable, $foreignColumn);
-        $this->collector->addCommand($command);
+        $command = new CreateForeignKeyCommand($this->tableName, $column, $foreignTable, $foreignColumn);
+        $this->schemaCommandCollector->addCommand($command);
 
         return $command;
     }
 
-    public function createIndex(string $table, array $columns): CreateIndexCommand
+    public function addIndex(string ...$columns): CreateIndexCommand
     {
-        $command = new CreateIndexCommand($table, $columns);
-        $this->collector->addCommand($command);
+        $command = new CreateIndexCommand($this->tableName, $columns);
+        $this->schemaCommandCollector->addCommand($command);
 
         return $command;
     }
 
     public function dropColumn(string $columnName): void
     {
-        $this->collector->addCommand(new DropColumnCommand($this->tableName, $columnName));
+        $this->schemaCommandCollector->addCommand(new DropColumnCommand($this->tableName, $columnName));
     }
 
     public function dropForeignKey(string $foreignKeyName): void
     {
-        $this->collector->addCommand(new DropForeignKeyCommand($this->tableName, $foreignKeyName));
+        $this->schemaCommandCollector->addCommand(new DropForeignKeyCommand($this->tableName, $foreignKeyName));
     }
 
     public function dropIndex(string $indexName): void
     {
-        $this->collector->addCommand(new DropIndexCommand($this->tableName, $indexName));
+        $this->schemaCommandCollector->addCommand(new DropIndexCommand($this->tableName, $indexName));
     }
 
     public function dropPrimaryKey(): void
     {
-        $this->collector->addCommand(new DropPrimaryKeyCommand($this->tableName));
+        $this->schemaCommandCollector->addCommand(new DropPrimaryKeyCommand($this->tableName));
     }
 
     public function getTableName(): string
@@ -113,9 +113,9 @@ final class TableDefinition
         return $this->tableName;
     }
 
-    public function getCollector(): TableCommandCollector
+    public function getTableCommandCollector(): TableCommandCollector
     {
-        return $this->collector;
+        return $this->tableCommandCollector;
     }
 
     public function timestamps(): void

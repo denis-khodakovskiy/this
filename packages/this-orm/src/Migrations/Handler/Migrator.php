@@ -16,7 +16,7 @@ use This\ORM\Migrations\Migration;
 use This\ORM\Migrations\Registry\RegistrySchema;
 use This\ORM\Migrations\Schema\SchemaBuilder;
 use This\ORM\Migrations\Schema\SchemaCommandCollector;
-use This\ORM\Migrations\Schema\TableDefinition;
+use This\ORM\Migrations\Schema\TableBuilder;
 use This\ORM\Migrations\Schema\TableCommandCollector;
 use This\ORM\ORMInterface;
 use This\ORM\Query\Insert;
@@ -167,7 +167,9 @@ final readonly class Migrator
                     $this->output->info($command->getDescription());
                 }
 
-                $this->orm->rawSql($this->compiler->compile($command));
+                $this->output->line($this->compiler->compile($command));
+
+                //$this->orm->rawSql($this->compiler->compile($command));
             }
 
             $end = microtime(true);
@@ -179,7 +181,7 @@ final readonly class Migrator
                 'checksum' => hash('sha256', file_get_contents("{$this->migrationsPath}/{$migrationFile}.php")),
                 'execution_time' => $executionTime,
             ]);
-            $this->orm->query($query)->execute();
+            //$this->orm->query($query)->execute();
         }
         $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
         $this->output->success('<b>All migrations have been applied successfully.</b>');
@@ -260,7 +262,7 @@ final readonly class Migrator
 
         $collector = new TableCommandCollector();
 
-        $table = new TableDefinition('migrations', $collector);
+        $table = new TableBuilder('migrations', $collector, new SchemaCommandCollector());
         $table->addColumn('id')->int()->autoIncrement()->primary();
         $table->addColumn('version')->string();
         $table->addColumn('checksum')->string(64);

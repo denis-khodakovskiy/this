@@ -8,12 +8,12 @@ declare(strict_types=1);
 namespace This\ORM\Migrations\Command;
 
 use This\ORM\Migrations\Schema\MigrationCommandInterface;
-use This\ORM\Migrations\Schema\TableDefinition;
+use This\ORM\Migrations\Schema\TableBuilder;
 
 final readonly class CreateTableCommand implements MigrationCommandInterface
 {
     public function __construct(
-        public TableDefinition $tableDefinition,
+        public TableBuilder $tableDefinition,
     ) {
     }
 

@@ -52,7 +52,7 @@ final class Compiler
             implode(",\n", array_map(
                 fn (MigrationCommandInterface $expression) => $this->compile($command),
                 array_filter(
-                    $command->tableDefinition->getCollector()->getCommands(),
+                    $command->tableDefinition->getTableCommandCollector()->getCommands(),
                     fn (MigrationCommandInterface $expression) => $expression instanceof AddColumnCommand,
                 ),
             )),

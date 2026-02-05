@@ -12,7 +12,7 @@ final class SchemaCommandCollector
     /** @var array<MigrationCommandInterface> */
     private array $commands = [];
 
-    public function add(MigrationCommandInterface $command): void
+    public function addCommand(MigrationCommandInterface $command): void
     {
         $this->commands[] = $command;
     }

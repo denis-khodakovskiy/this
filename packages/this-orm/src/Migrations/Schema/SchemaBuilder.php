@@ -29,10 +29,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         $collector = new TableCommandCollector();
-        $tableBuilder = new TableDefinition($name, $collector);
+        $tableBuilder = new TableBuilder($name, $collector);
         $definition($tableBuilder);
 
-        $this->commandCollector->add(new CreateTableCommand($tableBuilder));
+        $this->commandCollector->addCommand(new CreateTableCommand($tableBuilder));
     }
 
     /**
@@ -55,10 +55,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         $collector = new TableCommandCollector();
-        $tableBuilder = new TableDefinition($name, $collector);
+        $tableBuilder = new TableBuilder($name, $collector);
         $definition($tableBuilder);
 
-        $this->commandCollector->add(new AlterTableCommand($tableBuilder));
+        $this->commandCollector->addCommand(new AlterTableCommand($tableBuilder));
     }
 
     public function nonRollBack(): SchemaBuilderInterface
