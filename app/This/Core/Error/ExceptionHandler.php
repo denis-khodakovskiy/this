@@ -22,7 +22,7 @@ final readonly class ExceptionHandler implements ExceptionHandlerInterface
     public function handle(\Throwable $exception, ContextInterface $context): void
     {
         echo match (true) {
-            //$context->isCli() => $exception->getMessage(),
+            $context->isCli() => $exception->getMessage(),
             $context->isHttp() => $this->renderHtml($exception, $context),
             default => sprintf(
                 'An error occurred in %s:%d: %s',
@@ -30,7 +30,7 @@ final readonly class ExceptionHandler implements ExceptionHandlerInterface
                 $exception->getLine(),
                 $exception->getMessage()
             ),
-        };
+        } . PHP_EOL;
     }
 
     /**

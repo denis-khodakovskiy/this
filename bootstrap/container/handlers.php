@@ -8,6 +8,8 @@ declare(strict_types=1);
 use App\Handlers\CLI\CLIIndexHandler;
 use App\Handlers\HTTP\HTTPIndexHandler;
 use This\Contracts\ContainerInterface;
+use This\Output\CLI\CLIMarkupRenderer;
+use This\Output\CLI\CLIOutput;
 
 return function (ContainerInterface $container): void {
     $container
@@ -17,7 +19,9 @@ return function (ContainerInterface $container): void {
         )
         ->bind(
             id: CLIIndexHandler::class,
-            definition: static fn (ContainerInterface $container) => new CLIIndexHandler(),
+            definition: static fn (ContainerInterface $container) => new CLIIndexHandler(
+                new CLIOutput(new CLIMarkupRenderer()),
+            ),
         )
     ;
 };

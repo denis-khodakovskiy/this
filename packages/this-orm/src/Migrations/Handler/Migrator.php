@@ -93,12 +93,20 @@ final readonly class Migrator
         $this->output->line();
 
         $dryRun = $this->request->getAttribute('dry-run', false);
+        $noInteraction = $this->request->getAttribute('no-interaction', false);
 
         if ($dryRun) {
             $this->output->info('Dry run mode is enabled. No migrations will be applied');
         }
 
-        $this->output->confirmOrAbort('Are you sure you want to migrate the database?');
+        if ($noInteraction) {
+            $this->output->info('No interaction mode is enabled. Migrations will be applied without user confirmation');
+        }
+
+        if (!$noInteraction) {
+            $this->output->confirmOrAbort('Are you sure you want to migrate the database?');
+        }
+
         $this->checkMigrationsRegistry();
 
         $migrations = array_map(
@@ -128,7 +136,9 @@ final readonly class Migrator
                 $this->output->warning($migrationFile);
             }
 
-            $this->output->confirmOrAbort('These migrations were applied earlier, but are missing in the filesystem');
+            if (!$noInteraction) {
+                $this->output->confirmOrAbort('These migrations were applied earlier, but are missing in the filesystem');
+            }
         }
 
         $totalTime = 0;

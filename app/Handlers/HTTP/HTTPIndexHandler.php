@@ -16,7 +16,7 @@ final readonly class HTTPIndexHandler
                 <div>
                     <h2>THIS: That Handles It Somehow</h2>
                     <h3>Congratulations! It works!</h3>
-                    <p>%s handler was executed</p>
+                    <p>%s has been executed</p>
                     <p>You can find it here: %s</p>
                 </div>
             </pre>

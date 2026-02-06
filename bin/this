@@ -6,11 +6,12 @@
 
 use App\Kernel;
 use App\This\Core\Kernel\KernelConfig;
+use App\This\Middlewares\MiddlewaresRegistry;
 
 require_once "vendor/autoload.php";
 $container = require_once "bootstrap/container/_bootstrap.php";
 $router = require_once "bootstrap/router/_bootstrap.php";
-$middlewares = require_once "bootstrap/middlewares.php";
+$middlewares = MiddlewaresRegistry::getMiddlewares();
 
 (new Kernel($container, $router, $middlewares, new KernelConfig(
     rootDir: __DIR__ . '/..',
