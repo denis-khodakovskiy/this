@@ -9,8 +9,12 @@ use This\Contracts\ContainerInterface;
 use This\Contracts\EnvContainerInterface;
 use This\ORM\Compiler\ExpressionCompiler;
 use This\ORM\Compiler\QueryCompiler;
+use This\ORM\Hydrator\Hydrator;
+use This\ORM\Hydrator\HydratorInterface;
 use This\ORM\ORM;
 use This\ORM\ORMInterface;
+use This\ORM\Repository\RepositoryContext;
+use This\ORM\Repository\RepositoryContextInterface;
 use This\ORM\Transport\MySQLTransport;
 use This\ORM\Transport\TransportInterface;
 
@@ -44,5 +48,12 @@ return static function (ContainerInterface $container): void {
                 ),
             );
         })
+        ->bind(
+            id: RepositoryContextInterface::class,
+            definition: static fn (ContainerInterface $container) => new RepositoryContext(
+                $container->get(id: ORMInterface::class),
+            ),
+        )
+        ->bind(id: HydratorInterface::class, definition: static fn () => new Hydrator())
     ;
 };

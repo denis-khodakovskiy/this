@@ -19,7 +19,7 @@ final readonly class UserOrderSchema implements SchemaTableInterface, Persistabl
 
     public static function getTableName(): string
     {
-        return 'user_order';
+        return 'user_orders';
     }
 
     public function toArray(): array

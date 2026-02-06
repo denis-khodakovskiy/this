@@ -40,12 +40,12 @@ return function (RouteRegistry $router) {
             handler: \App\Handlers\UserController::class,
         ))
         ->addRoute(new Route(
-            name: 'orm.text',
+            name: 'orm.test',
             path: '/orm',
             handler: \App\Handlers\ORMHandler::class,
         ))
         ->addRoute(new Route(
-            name: 'orm.text',
+            name: 'orm.test',
             path: '/orm/{action}/{id}',
             handler: \App\Handlers\ORMHandler::class,
             requirements: ['action' => '[a-z]+'],

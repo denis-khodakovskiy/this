@@ -28,7 +28,13 @@ return function (ContainerInterface $container): void {
         ))
         ->bind(id: \App\Handlers\UserController::class, definition: static fn () => new \App\Handlers\UserController())
         ->bind(id: \App\Handlers\ORMHandler::class, definition: static fn (ContainerInterface $container) => new \App\Handlers\ORMHandler(
-            $container->get(id: \This\ORM\ORM::class),
+            $container->get(id: \App\Repository\UserRepositoryInterface::class),
         ))
+        ->bind(
+            id: \App\Handlers\RepositoryTestHandler::class,
+            definition: static fn (ContainerInterface $container) => new \App\Handlers\RepositoryTestHandler(
+                $container->get(\This\ORM\Repository\RepositoryContextInterface::class)->for(\App\Schemas\UserSchema::class)
+            ),
+        )
     ;
 };
