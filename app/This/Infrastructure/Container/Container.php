@@ -23,21 +23,43 @@ final class Container implements ContainerInterface
     /** @var array<non-empty-string, bool> */
     private array $resolving = [];
 
+    /** @var array<non-empty-string, int> */
+    private array $priorities = [];
+
     private bool $freeze = false;
 
-    public function bind(string $id, callable $definition): self
+    public function bind(string $id, callable $definition, int $priority = 1000): self
     {
         $this->checkFreeze(id: $id);
+
+        if ($this->has(id: $id) && $priority > $this->priorities[$id]) {
+            $this->bindings[$id] = $definition;
+            $this->priorities[$id] = $priority;
+
+            return $this;
+        }
+
         $this->bindings[$id] = $definition;
+        $this->priorities[$id] = $priority;
 
         return $this;
     }
 
-    public function singleton(string $id, callable $definition): self
+    public function singleton(string $id, callable $definition, int $priority = 1000): self
     {
         $this->checkFreeze(id: $id);
+
+        if ($this->has(id: $id) && $priority > $this->priorities[$id]) {
+            $this->bindings[$id] = $definition;
+            $this->singletons[$id] = true;
+            $this->priorities[$id] = $priority;
+
+            return $this;
+        }
+
         $this->bindings[$id] = $definition;
         $this->singletons[$id] = true;
+        $this->priorities[$id] = $priority;
 
         return $this;
     }

@@ -4,7 +4,7 @@ down:
 	docker compose down
 # === Composer install ===
 ci:
-	docker exec axiom_php composer install --no-interaction --prefer-dist
+	docker exec this_php composer install --no-interaction --prefer-dist
 # === Composer reset database ===
 init: up ci
 	@echo "Project initialized successfully."

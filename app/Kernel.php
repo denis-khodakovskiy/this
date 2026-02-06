@@ -34,7 +34,7 @@ final class Kernel implements KernelInterface
         private readonly array $middlewares,
         KernelConfig $config,
     ) {
-        $this->container = $container($config);
+        $this->container = $container();
         $this->container->get(id: KernelConfigProviderInterface::class)->setConfig($config);
         $routerRegistry = $this->container->get(id: RouteRegistry::class);
         $router($routerRegistry);

@@ -8,8 +8,7 @@ declare(strict_types=1);
 namespace This\Cache;
 
 use Psr\SimpleCache\InvalidArgumentException;
-use This\Cache\Contracts\CacheInterface;
-use This\Cache\Contracts\CacheStorageInterface;
+use This\Cache\Storage\CacheStorageInterface;
 
 final readonly class Cache implements CacheInterface
 {

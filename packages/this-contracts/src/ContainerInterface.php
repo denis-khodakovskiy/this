@@ -9,9 +9,9 @@ namespace This\Contracts;
 
 interface ContainerInterface extends \Psr\Container\ContainerInterface
 {
-    public function bind(string $id, callable $definition): self;
+    public function bind(string $id, callable $definition, int $priority = 1000): self;
 
-    public function singleton(string $id, callable $definition): self;
+    public function singleton(string $id, callable $definition, int $priority = 1000): self;
 
     public function has(string $id): bool;
 
