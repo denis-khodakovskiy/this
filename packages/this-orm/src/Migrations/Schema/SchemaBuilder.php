@@ -9,6 +9,7 @@ namespace This\ORM\Migrations\Schema;
 
 use This\ORM\Migrations\Command\AlterTableCommand;
 use This\ORM\Migrations\Command\CreateTableCommand;
+use This\ORM\Migrations\Command\DropTableCommand;
 
 final class SchemaBuilder implements SchemaBuilderInterface
 {
@@ -48,6 +49,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
         if ($this->rollbackable) {
             throw new \Exception('You have to explicitly call nonRollBack() method to drop a table.');
         }
+
+        $this->commandCollector->addCommand(new DropTableCommand($name));
     }
 
     /**

@@ -49,7 +49,7 @@ final readonly class Migrator
             || !is_dir($this->migrationsPath)
             || !is_writable($this->migrationsPath)
         ) {
-            $this->output->error("Migrations directory <b>{$this->migrationsPath}</b> does not exist or is not writable.");
+            $this->output->error("Migrations directory <b>{$this->migrationsPath}</b> does not exist or is not writable");
 
             exit(1);
         }
@@ -82,7 +82,7 @@ final readonly class Migrator
 
         file_put_contents("{$this->migrationsPath}/Version{$time}_{$name}.php", $code);
 
-        $this->output->success(sprintf('New migration file <b>%s</b> has been created successfully.', "{$this->migrationsPath}/Version{$time}_{$name}.php"));
+        $this->output->success(sprintf('New migration file <b>%s</b> has been created successfully', "{$this->migrationsPath}/Version{$time}_{$name}.php"));
     }
 
     /**
@@ -91,6 +91,13 @@ final readonly class Migrator
     private function migrate(): void
     {
         $this->output->line();
+
+        $dryRun = $this->request->getAttribute('dry-run', false);
+
+        if ($dryRun) {
+            $this->output->info('Dry run mode is enabled. No migrations will be applied');
+        }
+
         $this->output->confirmOrAbort('Are you sure you want to migrate the database?');
         $this->checkMigrationsRegistry();
 
@@ -121,7 +128,7 @@ final readonly class Migrator
                 $this->output->warning($migrationFile);
             }
 
-            $this->output->confirmOrAbort('These migrations were applied earlier, but are missing in the filesystem.');
+            $this->output->confirmOrAbort('These migrations were applied earlier, but are missing in the filesystem');
         }
 
         $totalTime = 0;
@@ -136,9 +143,9 @@ final readonly class Migrator
                     $this->output->error("Migration checksum mismatch: <b>{$migrationFile}</b>");
                     $this->output->error("<b>Applied checksum:</b> {$appliedMap[$migrationFile]['checksum']}");
                     $this->output->error("<b>Current checksum:</b> {$checksum}");
-                    $this->output->error("This usually means migration was modified after execution.");
+                    $this->output->error('This usually means migration was modified after execution.');
                     $this->output->info("You can fix this by running: <b>/migration/fix --version={$migrationFile}</b>");
-                    $this->output->error("Aborting migration execution.");
+                    $this->output->error('Aborting migration execution');
                     $this->output->line();
 
                     exit(1);
@@ -153,7 +160,7 @@ final readonly class Migrator
 
             if ($migration->draft()) {
                 $this->output->error("Migration <u><b>{$migrationFile}</b></u> is marked as draft and cannot be applied. <b><u>Reason:</u></b> {$migration->draftReason()}");
-                $this->output->error('Aborting migration execution.');
+                $this->output->error('Aborting migration execution');
                 $this->output->line();
 
                 exit(1);
@@ -171,19 +178,27 @@ final readonly class Migrator
                     $this->output->info($command->getDescription());
                 }
 
-                $this->orm->rawSql($this->compiler->compile($command));
+                $sql = $this->compiler->compile($command);
+
+                if (!$dryRun) {
+                    $this->orm->rawSql($this->compiler->compile($command));
+                } else {
+                    $this->output->line($sql);
+                }
             }
 
             $end = microtime(true);
             $executionTime = round(($end - $start) * 1000);
-            $this->output->success("Migration <u>{$migrationFile}</u> has been applied successfully in {$executionTime}ms.");
+            $this->output->success("Migration <u>{$migrationFile}</u> has been applied successfully in {$executionTime}ms");
 
-            $query = Insert::into(RegistrySchema::class)->values([
-                'version' => $migrationFile,
-                'checksum' => hash('sha256', file_get_contents("{$this->migrationsPath}/{$migrationFile}.php")),
-                'execution_time' => $executionTime,
-            ]);
-            $this->orm->query($query)->execute();
+            if (!$dryRun) {
+                $query = Insert::into(RegistrySchema::class)->values([
+                    'version' => $migrationFile,
+                    'checksum' => hash('sha256', file_get_contents("{$this->migrationsPath}/{$migrationFile}.php")),
+                    'execution_time' => $executionTime,
+                ]);
+                $this->orm->query($query)->execute();
+            }
 
             $totalTime += $executionTime;
         }
@@ -199,7 +214,7 @@ final readonly class Migrator
         $this->output->confirmOrAbort("Are you sure you want to fix migration <b>{$version}</b> checksum?");
 
         if (!file_exists("{$this->migrationsPath}/{$version}.php")) {
-            $this->output->error("Migration file <b>{$version}.php</b> does not exist.");
+            $this->output->error("Migration file <b>{$version}.php</b> does not exist");
             $this->output->line();
 
             exit(1);
@@ -209,7 +224,7 @@ final readonly class Migrator
         $migration = $this->orm->query($query)->first();
 
         if (!$migration) {
-            $this->output->error("Migration <b>{$version}</b> is not applied yet.");
+            $this->output->error("Migration <b>{$version}</b> is not applied yet");
             $this->output->line();
 
             exit(1);
@@ -218,7 +233,7 @@ final readonly class Migrator
         $checksum = hash('sha256', file_get_contents("{$this->migrationsPath}/{$version}.php"));
 
         if ($checksum === $migration['checksum']) {
-            $this->output->success("Migration <b>{$version}</b> checksum is up to date.");
+            $this->output->success("Migration <b>{$version}</b> checksum is up to date");
             $this->output->line();
 
             exit(1);
@@ -233,24 +248,34 @@ final readonly class Migrator
         ;
 
         if (!$this->orm->query($query)->execute()) {
-            $this->output->error("Failed to update checksum for migration <b>{$version}</b>.");
+            $this->output->error("Failed to update checksum for migration <b>{$version}</b>");
             $this->output->line();
 
             exit(1);
         }
 
-        $this->output->success("Checksum for migration <b>{$version}</b> has been updated successfully.");
+        $this->output->success("Checksum for migration <b>{$version}</b> has been updated successfully");
         $this->output->line();
     }
 
     public function rollback(): void
     {
+        $this->output->line();
+
+        $dryRun = $this->request->getAttribute('dry-run', false);
+
+        if ($dryRun) {
+            $this->output->info('Dry run mode is enabled. No migrations will be rolled back');
+        }
+
         $this->output->confirmOrAbort('Are you sure you want to rollback the database?');
         $amount = $this->request->getAttribute('n', $this->request->getAttribute(0));
 
         if ($amount === null) {
             $this->output->error('Please specify the number of migrations to rollback using --n=N flag');
             $this->output->line();
+
+            exit(1);
         }
 
         $migrationsToRollback = $this->orm->query(
@@ -259,6 +284,7 @@ final readonly class Migrator
                 ->limit((int) $amount)
         )->execute();
 
+        $this->output->line();
         $this->output->warning('You are about to rollback the following migrations:');
 
         foreach ($migrationsToRollback as $migration) {
@@ -275,6 +301,9 @@ final readonly class Migrator
         $totalTime = 0;
 
         foreach ($migrationsToRollback as $migrationData) {
+            $this->output->line(str_pad('', 80, '-', STR_PAD_BOTH));
+            $this->output->info("Rolling back migration: <b>{$migrationData['version']}</b>...");
+
             require_once "{$this->migrationsPath}/{$migrationData['version']}.php";
             $migration = new $migrationData['version']();
 
@@ -292,16 +321,26 @@ final readonly class Migrator
                     $this->output->info($command->getDescription());
                 }
 
-                $this->output->line($this->compiler->compile($command));
+                $sql = $this->compiler->compile($command);
 
-                //$this->orm->rawSql($this->compiler->compile($command));
+                if (!$dryRun) {
+                    $this->orm->rawSql($sql);
+                } else {
+                    $this->output->line($sql);
+                }
             }
 
             $end = microtime(true);
             $executionTime = round(($end - $start) * 1000);
-            //$this->orm->query(Delete::from(RegistrySchema::class)->where(Expr::equal('id', $migration['id'])))->execute();
 
-            $this->output->success("Migration <u>{$migrationData['version']}</u> has been rolled back successfully in {$executionTime}ms.");
+            if (!$dryRun) {
+                $this->orm
+                    ->query(Delete::from(RegistrySchema::class)->where(Expr::equal('id', $migrationData['id'])))
+                    ->execute()
+                ;
+            }
+
+            $this->output->success("Migration <u>{$migrationData['version']}</u> has been rolled back successfully in {$executionTime}ms");
 
             $totalTime += $executionTime;
         }
@@ -321,7 +360,7 @@ final readonly class Migrator
         $result = $this->orm->rawSql('SHOW TABLES LIKE "migrations"');
 
         if ($result === [] && !$this->createMigrationsRegistry()) {
-            $this->output->error('Migrations registry table is not found and cannot be created.');
+            $this->output->error('Migrations registry table is not found and cannot be created');
             $this->output->line();
 
             exit(1);
