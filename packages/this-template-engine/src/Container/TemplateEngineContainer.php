@@ -32,11 +32,11 @@ final class TemplateEngineContainer
                         ))
                         ->registerRenderer(new InlineRenderer())
                     ;
-                })
+                }, priority: 100)
                 ->singleton(id: TemplateEngineInterface::class, definition: static fn(ContainerInterface $container) => new TemplateEngine(
                     $container->get(ViewRendererRegistryInterface::class),
                     $container->get(RequestProviderInterface::class),
-                ))
+                ), priority: 100)
             ;
         };
     }

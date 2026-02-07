@@ -13,7 +13,7 @@ readonly class ComposedView extends AbstractView
 {
     /**
      * @param array<non-empty-string, non-empty-string> $params
-     * @param array<AssetInterface> $assets
+     * @param array<array-key, class-string> $assets
      * @param array<non-empty-string, mixed> $vars
      */
     public function __construct(

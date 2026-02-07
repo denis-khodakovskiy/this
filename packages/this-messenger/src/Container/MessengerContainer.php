@@ -49,6 +49,7 @@ final class MessengerContainer
                             queryBus: new QueryBus(executionBus: $executionBus),
                         );
                     },
+                    priority: 100,
                 )
             ;
         };

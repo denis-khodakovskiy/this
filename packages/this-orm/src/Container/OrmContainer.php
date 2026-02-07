@@ -31,7 +31,7 @@ final class OrmContainer
         return static function (ContainerInterface $container): void {
             $container
                 //ORM
-                ->bind(id: TransportInterface::class, definition: static fn () => new MySQLTransport())
+                ->bind(id: TransportInterface::class, definition: static fn () => new MySQLTransport(), priority: 100)
                 ->singleton(id: ORMInterface::class, definition: static function (ContainerInterface $container): ORM {
                     /** @var EnvContainerInterface $env */
                     $env = $container->get(id: EnvContainerInterface::class);
@@ -58,23 +58,24 @@ final class OrmContainer
                             ],
                         ),
                     );
-                })
+                }, priority: 100)
                 ->bind(
                     id: RepositoryContextInterface::class,
                     definition: static fn (ContainerInterface $container) => new RepositoryContext(
                         $container->get(id: ORMInterface::class),
                     ),
+                    priority: 100,
                 )
-                ->bind(id: HydratorInterface::class, definition: static fn () => new Hydrator())
+                ->bind(id: HydratorInterface::class, definition: static fn () => new Hydrator(), priority: 100)
 
                 //Migrations engine
-                ->bind(id: Compiler::class, definition: static fn () => new Compiler())
+                ->bind(id: Compiler::class, definition: static fn () => new Compiler(), priority: 100)
                 ->bind(id: Migrator::class, definition: static fn (ContainerInterface $container) => new Migrator(
                     $container->get(id: EnvContainerInterface::class)->get('MIGRATIONS_PATH'),
                     $container->get(id: RequestProviderInterface::class)->getRequest(),
                     $container->get(id: Compiler::class),
                     $container->get(id: ORMInterface::class),
-                ))
+                ), priority: 100)
             ;
         };
     }

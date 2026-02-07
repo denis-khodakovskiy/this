@@ -20,7 +20,7 @@ final class CacheContainer
             $container
                 ->singleton(id: CacheInterface::class, definition: static fn() => new Cache(
                     storage: new MemcachedStorage(new \Memcached()),
-                ))
+                ), priority: 100)
             ;
         };
     }

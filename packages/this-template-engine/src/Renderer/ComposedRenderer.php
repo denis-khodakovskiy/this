@@ -26,6 +26,10 @@ final readonly class ComposedRenderer implements ViewRendererInterface
     {
         assert($view instanceof ComposedView);
 
+        if ($view->assets !== []) {
+            $context->assets->register($view->assets);
+        }
+
         $content = $this->renderFile($view->template, array_merge($view->params, ['context' => $context]));
 
         if ($view->layout) {

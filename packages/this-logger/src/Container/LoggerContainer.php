@@ -30,6 +30,7 @@ final class LoggerContainer
                             ),
                         ],
                     ),
+                    priority: 100,
                 )
             ;
         };

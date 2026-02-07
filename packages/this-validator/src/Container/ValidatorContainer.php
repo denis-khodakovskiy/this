@@ -19,8 +19,8 @@ final class ValidatorContainer
     {
         return static function (ContainerInterface $container): void {
             $container
-                ->singleton(id: ValidationPipelineInterface::class, definition: static fn () => new ValidationPipeline())
-                ->bind(id: ValidatorInterface::class, definition: static fn () => new Validator())
+                ->singleton(id: ValidationPipelineInterface::class, definition: static fn () => new ValidationPipeline(), priority: 100)
+                ->bind(id: ValidatorInterface::class, definition: static fn () => new Validator(), priority: 100)
             ;
         };
     }

@@ -27,8 +27,9 @@ final class I18nContainer
                 ->bind(
                     id: TranslationFilePathResolverInterface::class,
                     definition: static fn () => new TranslationFilePathResolver(),
+                    priority: 100,
                 )
-                ->singleton(id: LocaleProviderInterface::class, definition: static fn() => new LocaleProvider())
+                ->singleton(id: LocaleProviderInterface::class, definition: static fn() => new LocaleProvider(), priority: 100)
                 ->singleton(
                     id: TranslatorInterface::class,
                     definition: static fn () => new Translator(
@@ -43,8 +44,9 @@ final class I18nContainer
                         $container->get(TranslationFilePathResolverInterface::class),
                         $container->get(id: LocaleProviderInterface::class)
                     ),
+                    priority: 100,
                 )
-                ->bind(id: TranslationMiddleware::class, definition: static fn () => new TranslationMiddleware())
+                ->bind(id: TranslationMiddleware::class, definition: static fn () => new TranslationMiddleware(), priority: 100)
             ;
         };
     }

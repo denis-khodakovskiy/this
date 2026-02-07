@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace This\TemplateEngine;
 
 use This\Contracts\RequestProviderInterface;
+use This\TemplateEngine\Asset\AssetManager;
 use This\TemplateEngine\Renderer\RenderContext;
 use This\TemplateEngine\Renderer\ViewRendererRegistryInterface;
 use This\TemplateEngine\View\AbstractView;
@@ -27,6 +28,7 @@ final readonly class TemplateEngine implements TemplateEngineInterface
                 return $renderer->render($view, new RenderContext(
                     $this,
                     $this->requestProvider->getRequest(),
+                    new AssetManager(),
                     $view->vars,
                 ));
             }

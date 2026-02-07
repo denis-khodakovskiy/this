@@ -12,15 +12,15 @@ interface AssetInterface
     /**
      * @return array<array-key, non-empty-string>
      */
-    public function getCSS(): array;
+    public function css(): array;
 
     /**
      * @return array<array-key, non-empty-string>
      */
-    public function getJS(): array;
+    public function js(): array;
 
     /**
      * @return array<AssetInterface>
      */
-    public function getDependencies(): array;
+    public function depends(): array;
 }
