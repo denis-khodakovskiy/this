@@ -7,49 +7,31 @@ declare(strict_types=1);
 
 namespace This\TemplateEngine;
 
-use This\TemplateEngine\Contracts\TemplateEngineInterface;
-use This\TemplateEngine\Contracts\ViewInterface;
+use This\Contracts\RequestProviderInterface;
+use This\TemplateEngine\Renderer\RenderContext;
+use This\TemplateEngine\Renderer\ViewRendererRegistryInterface;
+use This\TemplateEngine\View\AbstractView;
 
 final readonly class TemplateEngine implements TemplateEngineInterface
 {
     public function __construct(
-        private string $viewsDirectoryPath,
+        private ViewRendererRegistryInterface $viewRendererRegistry,
+        private RequestProviderInterface $requestProvider,
     ) {
     }
 
-    public function partialRender(string $viewPath, array $params = []): string
+    public function renderView(AbstractView $view): ?string
     {
-        return $this->renderTemplate($viewPath, $params);
-    }
-
-    public function renderView(ViewInterface $view): string
-    {
-        $content = $this->renderTemplate($view->template(), $view->params());
-
-        return '';
-    }
-
-    public function renderTemplate(string $viewPath, array $params = []): string
-    {
-        try {
-            if (!empty($params)) {
-                extract($params);
+        foreach ($this->viewRendererRegistry->getRenderers() as $renderer) {
+            if ($renderer->supports($view)) {
+                return $renderer->render($view, new RenderContext(
+                    $this,
+                    $this->requestProvider->getRequest(),
+                    $view->vars,
+                ));
             }
-
-            $viewFilePath = rtrim($this->viewsDirectoryPath, '/') . '/' . trim($viewPath, '/') . '.php';
-
-            if (
-                !file_exists($viewFilePath)
-                || !is_file($viewFilePath)
-                || !is_readable($viewFilePath)
-            ) {
-                throw new \RuntimeException("View file {$viewFilePath} does not exist or is not readable");
-            }
-
-            ob_start();
-            include $viewFilePath;
-        } finally {
-            return ob_get_clean() ?: '';
         }
+
+        return null;
     }
 }

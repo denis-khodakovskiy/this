@@ -10,6 +10,8 @@ $lambdas = [
     require_once __DIR__ . '/handlers.php',
     require_once __DIR__ . '/middlewares.php',
     require_once __DIR__ . '/services.php',
+    require_once __DIR__ . '/test.php',
+    \This\TemplateEngine\Container\TemplateEngineContainer::register(),
 ];
 
 return function () use ($lambdas): ContainerInterface {

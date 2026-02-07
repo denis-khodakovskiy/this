@@ -5,22 +5,22 @@
 
 declare(strict_types=1);
 
-namespace This\TemplateEngine\Contracts;
+namespace This\TemplateEngine\Asset;
 
-interface AssetGroupInterface
+interface AssetInterface
 {
     /**
      * @return array<array-key, non-empty-string>
      */
-    public function getCss(): array;
+    public function getCSS(): array;
 
     /**
      * @return array<array-key, non-empty-string>
      */
-    public function getJs(): array;
+    public function getJS(): array;
 
     /**
-     * @return array<array-key, non-empty-string>
+     * @return array<AssetInterface>
      */
     public function getDependencies(): array;
 }

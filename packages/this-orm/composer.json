@@ -9,7 +9,8 @@
   "require": {
     "php": "^8.2",
     "this/contracts": "dev-master",
-    "this/output": "dev-master"
+    "this/output": "dev-master",
+    "ext-pdo": "*"
   },
 
   "autoload": {
