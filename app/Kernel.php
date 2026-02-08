@@ -7,15 +7,16 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\This\Core\Kernel\Context;
 use App\This\Core\Kernel\KernelConfig;
+use App\This\Core\Request\RequestContext;
 use App\This\Core\Routing\RouteRegistry;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use This\Contracts\ContainerInterface;
-use This\Contracts\ContextInterface;
 use This\Contracts\KernelConfigProviderInterface;
 use This\Contracts\KernelInterface;
+use This\Contracts\RequestContextInterface;
+use This\Contracts\RequestMetaCollectorInterface;
 
 final class Kernel implements KernelInterface
 {
@@ -65,10 +66,15 @@ final class Kernel implements KernelInterface
         $this->launchPipeline();
     }
 
-    private function getContext(): Context
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function getContext(): RequestContext
     {
-        return new Context(
+        return new RequestContext(
             container: $this->container,
+            meta: $this->container->get(id: RequestMetaCollectorInterface::class),
         );
     }
 
@@ -80,14 +86,14 @@ final class Kernel implements KernelInterface
     {
         $container = $this->container;
 
-        $next = function (ContextInterface $context): void {};
+        $next = function (RequestContextInterface $context): void {};
 
         foreach (array_reverse($this->middlewares) as $id) {
             $middleware = $container->get($id);
 
             $prevNext = $next;
 
-            $next = function (ContextInterface $context) use ($middleware, $prevNext): void {
+            $next = function (RequestContextInterface $context) use ($middleware, $prevNext): void {
                 $middleware($context, $prevNext);
             };
         }

@@ -9,7 +9,9 @@ namespace App\This\Middlewares\Request;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
+use This\Contracts\RequestInterface;
+use This\Contracts\RequestMetaCollectorInterface;
 use This\Contracts\RequestProviderInterface;
 use This\Contracts\RequestResolverInterface;
 use This\Contracts\RequestResolversRegistryInterface;
@@ -20,16 +22,12 @@ class RequestInitMiddleware
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         /** @var RequestResolverInterface $requestResolver */
         $requestResolver = $context->getContainer()->get(RequestResolversRegistryInterface::class)->getResolver();
         $request = $requestResolver->resolve();
-        $context->setRequest($request);
-
-        /** @var RequestProviderInterface $requestProvider */
-        $requestProvider = $context->getContainer()->get(RequestProviderInterface::class);
-        $requestProvider->setRequest($request);
+        $context->getContainer()->get(RequestMetaCollectorInterface::class)->set(RequestInterface::class, $request);
 
         $next($context);
     }

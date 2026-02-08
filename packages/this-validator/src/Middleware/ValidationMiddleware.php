@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace This\Validator\Middleware;
 
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\MiddlewareInterface;
 use This\Contracts\RequestMethodsEnum;
 use This\Validator\Exception\ValidationException;
@@ -19,7 +19,7 @@ class ValidationMiddleware implements MiddlewareInterface
     /**
      * @throws ValidationException
      */
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         $next($context);
     }

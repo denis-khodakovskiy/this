@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace App\This\Infrastructure\Container;
 
 use This\Contracts\ContainerInterface;
+use This\Security\Provider\UserIdentityResolverInterface;
 
 final class Container implements ContainerInterface
 {
@@ -32,9 +33,11 @@ final class Container implements ContainerInterface
     {
         $this->checkFreeze(id: $id);
 
-        if ($this->has(id: $id) && $priority > $this->priorities[$id]) {
-            $this->bindings[$id] = $definition;
-            $this->priorities[$id] = $priority;
+        if ($this->has(id: $id)) {
+            if ($priority > $this->priorities[$id]) {
+                $this->bindings[$id] = $definition;
+                $this->priorities[$id] = $priority;
+            }
 
             return $this;
         }
@@ -49,10 +52,12 @@ final class Container implements ContainerInterface
     {
         $this->checkFreeze(id: $id);
 
-        if ($this->has(id: $id) && $priority > $this->priorities[$id]) {
-            $this->bindings[$id] = $definition;
-            $this->singletons[$id] = true;
-            $this->priorities[$id] = $priority;
+        if ($this->has(id: $id)) {
+            if ($priority > $this->priorities[$id]) {
+                $this->bindings[$id] = $definition;
+                $this->singletons[$id] = true;
+                $this->priorities[$id] = $priority;
+            }
 
             return $this;
         }

@@ -9,7 +9,5 @@ namespace This\Contracts;
 
 interface RequestProviderInterface
 {
-    public function setRequest(RequestInterface $request): void;
-
     public function getRequest(): RequestInterface;
 }

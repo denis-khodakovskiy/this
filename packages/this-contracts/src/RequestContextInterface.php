@@ -9,11 +9,9 @@ namespace This\Contracts;
 
 use App\This\Core\Response\Response;
 
-interface ContextInterface
+interface RequestContextInterface
 {
     public function getContainer(): ContainerInterface;
-
-    public function setRequest(RequestInterface $request): self;
 
     public function getRequest(): RequestInterface;
 

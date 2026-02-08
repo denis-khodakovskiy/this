@@ -13,7 +13,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\MiddlewareInterface;
 use This\Contracts\RequestMethodsEnum;
 
@@ -23,7 +23,7 @@ final class ExecutionMiddleware implements MiddlewareInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         if ($context->getResponse() !== null) {
             $next($context);

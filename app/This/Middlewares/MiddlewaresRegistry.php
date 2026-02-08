@@ -14,6 +14,8 @@ use App\This\Middlewares\Request\RequestFreezeMiddleware;
 use App\This\Middlewares\Request\RequestInitMiddleware;
 use App\This\Middlewares\Response\ResponseHandlingMiddleware;
 use App\This\Middlewares\Routing\RouterMiddleware;
+use This\Security\Middleware\SecurityMiddleware;
+use This\Session\Middleware\SessionMiddleware;
 
 final class MiddlewaresRegistry
 {
@@ -22,9 +24,11 @@ final class MiddlewaresRegistry
         return [
             ErrorBoundaryMiddleware::class,
             ContextInitMiddleware::class,
+            SessionMiddleware::class,
             RequestInitMiddleware::class,
             RouterMiddleware::class,
             RequestFreezeMiddleware::class,
+            SecurityMiddleware::class,
             ExecutionMiddleware::class,
             ResponseHandlingMiddleware::class
         ];

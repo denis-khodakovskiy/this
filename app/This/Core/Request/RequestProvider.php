@@ -8,23 +8,24 @@ declare(strict_types=1);
 namespace App\This\Core\Request;
 
 use This\Contracts\RequestInterface;
+use This\Contracts\RequestMetaCollectorInterface;
 use This\Contracts\RequestProviderInterface;
 
-final class RequestProvider implements RequestProviderInterface
+final readonly class RequestProvider implements RequestProviderInterface
 {
-    private ?RequestInterface $request = null;
-
-    public function setRequest(RequestInterface $request): void
-    {
-        $this->request = $request;
+    public function __construct(
+        private RequestMetaCollectorInterface $requestMeta,
+    ) {
     }
 
     public function getRequest(): RequestInterface
     {
-        if ($this->request === null) {
+        $request = $this->requestMeta->get(RequestInterface::class);
+
+        if (!$request instanceof RequestInterface) {
             throw new \RuntimeException('Request not initialized yet');
         }
 
-        return $this->request;
+        return $request;
     }
 }

@@ -10,7 +10,7 @@ namespace This\Controller\Middleware;
 use App\This\Core\Response\Response;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Controller\Target\ControllerTarget;
 
 final class ControllerResolverMiddleware
@@ -20,7 +20,7 @@ final class ControllerResolverMiddleware
      * @throws NotFoundExceptionInterface
      * @throws \ReflectionException
      */
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         if ($context->getResponse() !== null || $context->isCli()) {
             $next($context);

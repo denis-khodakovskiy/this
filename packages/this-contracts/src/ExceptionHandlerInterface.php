@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace This\Contracts;
 
-use App\This\Core\Kernel\Context;
+use App\This\Core\Request\RequestContext;
 
 interface ExceptionHandlerInterface
 {
-    public function handle(\Throwable $exception, Context $context): void;
+    public function handle(\Throwable $exception, RequestContext $context): void;
 }

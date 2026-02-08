@@ -10,7 +10,7 @@ namespace App\This\Core\Error;
 use App\This\Core\Kernel\KernelConfigProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\ExceptionHandlerInterface;
 use This\Contracts\KernelConfigProviderInterface;
 
@@ -19,7 +19,7 @@ final readonly class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @throws \Throwable
      */
-    public function handle(\Throwable $exception, ContextInterface $context): void
+    public function handle(\Throwable $exception, RequestContextInterface $context): void
     {
         echo match (true) {
             $context->isCli() => $exception->getMessage(),
@@ -37,7 +37,7 @@ final readonly class ExceptionHandler implements ExceptionHandlerInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    private function renderHtml(\Throwable $exception, ContextInterface $context): string
+    private function renderHtml(\Throwable $exception, RequestContextInterface $context): string
     {
         /** @var KernelConfigProvider $configProvider */
         $configProvider = $context->getContainer()->get(id: KernelConfigProviderInterface::class);

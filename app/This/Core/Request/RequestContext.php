@@ -5,22 +5,22 @@
 
 declare(strict_types=1);
 
-namespace App\This\Core\Kernel;
+namespace App\This\Core\Request;
 
 use App\This\Core\Response\Response;
 use This\Contracts\ContainerInterface;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\RequestInterface;
+use This\Contracts\RequestMetaCollectorInterface;
 use This\Contracts\RouteInterface;
 
-final class Context implements ContextInterface
+final class RequestContext implements RequestContextInterface
 {
     public function __construct(
         private readonly ContainerInterface $container,
-        private ?RequestInterface $request = null,
+        private readonly RequestMetaCollectorInterface $meta,
         private mixed $response = null,
         private ?\Throwable $exception = null,
-        private array $meta = [],
         private bool $isCli = false,
         private bool $isHttp = false,
         private ?RouteInterface $route = null,
@@ -32,16 +32,9 @@ final class Context implements ContextInterface
         return $this->container;
     }
 
-    public function setRequest(RequestInterface $request): self
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
     public function getRequest(): RequestInterface
     {
-        return $this->request;
+        return $this->meta->get(RequestInterface::class);
     }
 
     public function setResponse(Response $response): self
@@ -70,19 +63,19 @@ final class Context implements ContextInterface
 
     public function addMeta(string $key, mixed $value): self
     {
-        $this->meta[$key] = $value;
+        $this->meta->set($key, $value);
 
         return $this;
     }
 
     public function getMetaValue(string $key, mixed $default = null): mixed
     {
-        return $this->meta[$key] ?? $default;
+        return $this->meta->get($key, $default);
     }
 
     public function getMeta(): array
     {
-        return $this->meta;
+        return $this->meta->all();
     }
 
     public function isCli(): bool

@@ -2,7 +2,7 @@
 /**
  * @author Denis Khodakovskii <denis.khodakovskiy@gmail.com>
  *
- * @var ContextInterface $context
+ * @var RequestContextInterface $context
  * @var Throwable $exception
  * @var array $exceptionFrame
  * @var array $traceFrames
@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 ?>
 
 <!DOCTYPE html>

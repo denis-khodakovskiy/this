@@ -7,14 +7,14 @@ declare(strict_types=1);
 
 namespace This\i18n\Middleware;
 
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\KernelConfigProviderInterface;
 use This\Contracts\MiddlewareInterface;
 use This\i18n\Contracts\LocaleProviderInterface;
 
 class TranslationMiddleware implements MiddlewareInterface
 {
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         $context->getContainer()->get(LocaleProviderInterface::class)->setLocale(
             $context->isCli()
@@ -25,7 +25,7 @@ class TranslationMiddleware implements MiddlewareInterface
         $next($context);
     }
 
-    private function getCliLocale(ContextInterface $context): string
+    private function getCliLocale(RequestContextInterface $context): string
     {
         /** @var KernelConfigProviderInterface $kernelConfigProvider */
         $kernelConfigProvider = $context->getContainer()->get(KernelConfigProviderInterface::class);
@@ -35,7 +35,7 @@ class TranslationMiddleware implements MiddlewareInterface
         return $request->getAttribute(key: 'locale') ?? $kernelConfig->getDefaultLocale();
     }
 
-    private function getHttpLocale(ContextInterface $context): string
+    private function getHttpLocale(RequestContextInterface $context): string
     {
         /** @var KernelConfigProviderInterface $kernelConfigProvider */
         $kernelConfigProvider = $context->getContainer()->get(KernelConfigProviderInterface::class);

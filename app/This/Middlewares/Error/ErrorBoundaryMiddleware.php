@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace App\This\Middlewares\Error;
 
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\ExceptionHandlerInterface;
 use This\Contracts\MiddlewareInterface;
 
@@ -18,7 +18,7 @@ final readonly class ErrorBoundaryMiddleware implements MiddlewareInterface
     ) {
     }
 
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         try {
             $next($context);

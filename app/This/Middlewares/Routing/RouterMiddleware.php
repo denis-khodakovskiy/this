@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace App\This\Middlewares\Routing;
 
 use App\This\Core\Routing\RouteRegistry;
-use This\Contracts\ContextInterface;
+use This\Contracts\RequestContextInterface;
 use This\Contracts\MiddlewareInterface;
 use This\Contracts\RequestInterface;
 use This\Contracts\RouteInterface;
@@ -24,7 +24,7 @@ final readonly class RouterMiddleware implements MiddlewareInterface
     ) {
     }
 
-    public function __invoke(ContextInterface $context, callable $next): void
+    public function __invoke(RequestContextInterface $context, callable $next): void
     {
         if (!$context->getRequest()) {
             throw new \RuntimeException('Request not initialized');
